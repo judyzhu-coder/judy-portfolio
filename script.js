@@ -23,8 +23,8 @@ const projects = {
     summary: "面向 AI 创作者的线下产品体验活动。我的主要职责是活动策划、内容框架、30+ KOL 邀约与现场协同。",
     facts: [["角色", "活动策划"], ["邀约", "30+ KOL"], ["范围", "策划到现场"]],
     body: ["定义活动主题、流程与产品体验方式", "设计 AI 产品体验市集与引导内容", "负责 KOL 筛选、触达、沟通和到场协同", "配合报名、日程、现场与回顾内容发布"],
-    images: [["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-program.png", "活动任务页面"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-workshop.png", "Workshop 创作页面"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-closing.png", "结业与合影页面"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-event/experience-market.png", "AI 产品体验市集"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-event/registration-poster.png", "活动报名海报"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-event/guest-lineup.png", "特邀嘉宾阵容"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-event/creator-call.png", "创作者招募"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-event/agenda-morning.png", "上午议程"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-event/agenda-afternoon.png", "下午议程"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-event/event-vlog.png", "活动现场回顾"]],
-    links: [["策划 Deck", "https://www.figma.com/deck/55VpGyzfAIOovBhZg39SKf/OPE-summer-camp-proposal?node-id=76-112&t=x63Zz0fhOxQHrgio-1"], ["小红书活动账号", "https://www.xiaohongshu.com/user/profile/686b595a000000001b01b3c0"]]
+    images: [["assets/images/ope-event/what-this-is-about.png", "OPE Summer Camp 活动主题与创作方向页面"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-program.png", "活动任务页面"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-workshop.png", "Workshop 创作页面"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-closing.png", "结业与合影页面"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-event/experience-market.png", "AI 产品体验市集"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-event/registration-poster.png", "活动报名海报"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-event/guest-lineup.png", "特邀嘉宾阵容"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-event/creator-call.png", "创作者招募"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-event/agenda-morning.png", "上午议程"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-event/agenda-afternoon.png", "下午议程"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/ope-event/event-vlog.png", "活动现场回顾"]],
+    links: [["查看活动回顾", "https://www.xiaohongshu.com/discovery/item/68bfa644000000001d0252ed?source=webshare&xhsshare=pc_web&xsec_token=ABVvItUJWZ5ODQjpW2gEiYMRR1z9KOZOQ-NZU1zLN_0GI=&xsec_source=pc_share"]]
   },
   dingyuyan: {
     meta: "LIVE WECHAT MINI PROGRAM · 2026",
@@ -84,7 +84,7 @@ const projects = {
     facts: [["方向", "海外 GTM"], ["对象", "AI 3D 创作者"], ["方法", "模型评测"]],
     body: ["定义目标创作者和使用场景", "整理英文价值表达与差异化方向", "评测 Text-to-3D 与 Image-to-3D 能力", "将几何、纹理和鲁棒性问题反馈到产品迭代"],
     images: [["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/trellis-usecase.png", "TRELLIS 个性化 3D 创作场景"], ["https://cdn.jsdelivr.net/gh/judyzhu-coder/judy-portfolio@main/assets/images/trellis-flow.png", "TRELLIS 生成能力路径"]],
-    links: [["查看 Deck", "https://www.figma.com/deck/4bn0NWuiGYlWcH0PgNNmCX"]]
+    links: []
   }
 };
 
