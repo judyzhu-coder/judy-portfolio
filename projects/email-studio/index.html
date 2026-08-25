@@ -1,0 +1,3325 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23105c54'/%3E%3Cpath d='M15 21h34v24H15z' fill='none' stroke='white' stroke-width='4'/%3E%3Cpath d='m16 23 16 13 16-13' fill='none' stroke='white' stroke-width='4'/%3E%3C/svg%3E">
+  <title>邮件工坊 - 营销邮件生成工具</title>
+  <style>
+    :root {
+      --bg: #f3f5f4;
+      --surface: #fafbfa;
+      --surface-strong: #ffffff;
+      --surface-muted: #eef1f0;
+      --text: #18201f;
+      --text-soft: #515e5b;
+      --text-faint: #6a7673;
+      --line: #d9dedc;
+      --line-strong: #bdc7c4;
+      --accent: #176b61;
+      --accent-strong: #10564e;
+      --accent-soft: #dcefeb;
+      --button-text: #f7fbfa;
+      --warning: #9b5d16;
+      --warning-soft: #fbefd9;
+      --danger: #a5403a;
+      --danger-soft: #f9e7e5;
+      --success: #24735d;
+      --shadow: 0 16px 36px rgba(31, 48, 44, 0.10);
+      --radius: 8px;
+      --radius-small: 6px;
+      --font: "SF Pro Display", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --bg: #101514;
+      --surface: #151b1a;
+      --surface-strong: #1b2321;
+      --surface-muted: #222a28;
+      --text: #edf5f3;
+      --text-soft: #b6c6c3;
+      --text-faint: #8fa19e;
+      --line: #333d3a;
+      --line-strong: #4a5955;
+      --accent: #78b9ad;
+      --accent-strong: #a0d3c9;
+      --accent-soft: #233e39;
+      --button-text: #102622;
+      --warning: #e0ad65;
+      --warning-soft: #3a2c1c;
+      --danger: #ee9189;
+      --danger-soft: #3b2423;
+      --success: #8bcab8;
+      --shadow: 0 24px 60px rgba(2, 8, 7, 0.28);
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { background: var(--bg); }
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--text);
+      background: var(--bg);
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, textarea, select { font: inherit; }
+    button, a, label[for] { -webkit-tap-highlight-color: transparent; }
+    button { color: inherit; }
+    a { color: inherit; }
+    .app { min-height: 100dvh; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--surface-strong) 94%, transparent);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      color: var(--button-text);
+      background: var(--accent-strong);
+      font-weight: 800;
+      letter-spacing: 0;
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
+    }
+    .brand-name { font-size: 16px; font-weight: 750; letter-spacing: 0; }
+    .brand-sub { color: var(--text-faint); font-size: 12px; margin-top: 2px; }
+    .top-actions { display: flex; align-items: center; gap: 10px; }
+    .session-note { color: var(--text-soft); font-size: 12px; }
+    .save-state { color: var(--text-faint); font-size: 11px; white-space: nowrap; }
+
+    .button {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 16px;
+      border: 1px solid transparent;
+      border-radius: var(--radius-small);
+      background: var(--accent-strong);
+      color: var(--button-text);
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 20px;
+      text-decoration: none;
+      white-space: nowrap;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(22, 43, 39, 0.16);
+      transition: transform 140ms ease, background 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+    }
+    .button:hover { background: var(--accent); box-shadow: 0 3px 8px rgba(22, 43, 39, 0.16); transform: translateY(-1px); }
+    .button:active { transform: translateY(1px); box-shadow: 0 1px 2px rgba(22, 43, 39, 0.12); }
+    .button:focus-visible, .icon-button:focus-visible, .step-button:focus-visible,
+    .segment:focus-visible, .preview-switch button:focus-visible,
+    input:focus-visible, textarea:focus-visible, select:focus-visible, .choice:focus-within, .dropzone:focus-within {
+      outline: 3px solid color-mix(in srgb, var(--accent) 35%, transparent);
+      outline-offset: 2px;
+    }
+    .button.secondary { background: var(--surface-strong); color: var(--text); border-color: var(--line-strong); box-shadow: 0 1px 2px rgba(24, 38, 35, 0.05); }
+    .button.secondary:hover { border-color: var(--accent); color: var(--accent-strong); }
+    .button.ghost { background: transparent; color: var(--text-soft); border-color: var(--line); box-shadow: none; }
+    .button.ghost:hover { color: var(--text); border-color: var(--line-strong); }
+    .button.small { min-height: 34px; padding: 6px 11px; font-size: 12px; }
+    .button[disabled] { opacity: 0.48; cursor: not-allowed; transform: none; }
+    .icon-button {
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      background: var(--surface-strong);
+      color: var(--text-soft);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      transition: color 140ms ease, border-color 140ms ease, background 140ms ease, transform 140ms ease;
+    }
+    .icon-button:hover { border-color: var(--line-strong); color: var(--accent-strong); background: var(--surface-muted); }
+    .icon-button:active { transform: translateY(1px); }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 224px minmax(0, 1fr);
+      min-height: calc(100dvh - 64px);
+      transition: grid-template-columns 180ms ease;
+    }
+    .layout.sidebar-collapsed { grid-template-columns: 72px minmax(0, 1fr); }
+    .sidebar {
+      position: sticky;
+      top: 64px;
+      height: calc(100dvh - 64px);
+      padding: 24px 14px;
+      border-right: 1px solid var(--line);
+      background: var(--surface);
+      overflow-y: auto;
+    }
+    .sidebar-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 4px 16px 10px; }
+    .sidebar-title { color: var(--text); font-size: 13px; font-weight: 800; white-space: nowrap; }
+    .sidebar-toggle {
+      width: 32px;
+      height: 32px;
+      flex: 0 0 32px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      color: var(--text-soft);
+      background: var(--surface-strong);
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .sidebar-toggle:hover { border-color: var(--accent); color: var(--accent-strong); }
+    .sidebar-toggle:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 35%, transparent); outline-offset: 2px; }
+    .steps { display: grid; gap: 6px; }
+    .step-button {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 10px;
+      border: 0;
+      border-radius: var(--radius-small);
+      background: transparent;
+      color: var(--text-soft);
+      text-align: left;
+      cursor: pointer;
+    }
+    .step-button:hover { background: var(--surface-muted); color: var(--text); }
+    .step-button.active { background: var(--accent-soft); color: var(--accent-strong); box-shadow: inset 2px 0 0 var(--accent); }
+    .step-button.completed { color: var(--text); }
+    .step-index {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line-strong);
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 750;
+      background: var(--surface-strong);
+    }
+    .step-button.active .step-index { border-color: var(--accent); background: var(--accent-strong); color: var(--button-text); }
+    .step-button.completed .step-index { border-color: var(--accent); color: var(--accent-strong); background: var(--surface-strong); }
+    .step-label { font-size: 14px; font-weight: 700; }
+    .step-desc { display: none; }
+    .sidebar-foot {
+      margin: 28px 10px 0;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      color: var(--text-faint);
+      font-size: 11px;
+      line-height: 1.6;
+    }
+    .layout.sidebar-collapsed .sidebar { padding-left: 10px; padding-right: 10px; }
+    .layout.sidebar-collapsed .sidebar-head { justify-content: center; margin-left: 0; margin-right: 0; }
+    .layout.sidebar-collapsed .sidebar-title,
+    .layout.sidebar-collapsed .sidebar-foot,
+    .layout.sidebar-collapsed .step-label { display: none; }
+    .layout.sidebar-collapsed .step-button { grid-template-columns: 30px; justify-content: center; padding-left: 10px; padding-right: 10px; }
+
+    .main { min-width: 0; padding: 22px 24px 30px; }
+    .main-inner { max-width: 1280px; margin: 0 auto; }
+    .layout.preview-focus .main-inner { max-width: 1500px; }
+    .page-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 14px;
+    }
+    .page-title { margin: 0; font-size: clamp(24px, 2.4vw, 31px); line-height: 1.18; letter-spacing: 0; font-weight: 780; }
+    .page-copy { max-width: 640px; margin: 6px 0 0; color: var(--text-soft); font-size: 13px; line-height: 1.55; }
+    .demo-badge {
+      flex: 0 0 auto;
+      padding: 8px 11px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      color: var(--text-soft);
+      background: var(--surface);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .page-meta { display: flex; align-items: center; gap: 12px; }
+    .step-counter { color: var(--text-faint); font-size: 12px; font-weight: 700; white-space: nowrap; }
+
+    .workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, 260px); gap: 14px; align-items: start; }
+    .workspace.preview-mode { grid-template-columns: minmax(320px, 0.32fr) minmax(0, 0.68fr); gap: 12px; }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-strong);
+      box-shadow: none;
+    }
+    .panel-body { padding: 20px 22px; }
+    .panel-head { padding: 15px 22px; border-bottom: 1px solid var(--line); }
+    .panel-title { margin: 0; font-size: 15px; line-height: 1.4; letter-spacing: 0; }
+    .panel-copy { margin: 4px 0 0; color: var(--text-soft); font-size: 12px; line-height: 1.5; }
+    .sticky-preview { position: sticky; top: 92px; overflow: hidden; }
+
+    .step-panel { display: none; }
+    .step-panel.active { display: block; animation: enter 220ms cubic-bezier(.2,.8,.2,1); }
+    @keyframes enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .field-grid.single { grid-template-columns: 1fr; }
+    .field { display: grid; gap: 8px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { color: var(--text); font-size: 13px; font-weight: 700; }
+    .helper { color: var(--text-faint); font-size: 11px; line-height: 1.5; }
+    .error { display: none; color: var(--danger); font-size: 11px; }
+    .error.show { display: block; }
+    input, textarea, select {
+      width: 100%;
+      min-height: 43px;
+      padding: 10px 12px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-small);
+      color: var(--text);
+      background: var(--surface-strong);
+      box-shadow: inset 0 1px 1px rgba(24, 38, 35, 0.03);
+      transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
+    }
+    input:hover, textarea:hover, select:hover { border-color: color-mix(in srgb, var(--line-strong) 68%, var(--text-soft)); }
+    input:focus, textarea:focus, select:focus { border-color: var(--accent); background: var(--surface-strong); box-shadow: 0 0 0 1px var(--accent); }
+    textarea { min-height: 90px; resize: vertical; line-height: 1.55; }
+    .source-output {
+      min-height: 280px;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 11px;
+      line-height: 1.55;
+      white-space: pre;
+      tab-size: 2;
+    }
+    input::placeholder, textarea::placeholder { color: var(--text-faint); opacity: 1; }
+    .input-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
+
+    .notice {
+      display: grid;
+      gap: 5px;
+      padding: 14px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius-small);
+      background: var(--surface-muted);
+      color: var(--text-soft);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .notice strong { color: var(--text); }
+    .notice.warning { border-left-color: var(--warning); background: var(--warning-soft); }
+    .notice.danger { border-left-color: var(--danger); background: var(--danger-soft); }
+    .stack { display: grid; gap: 16px; }
+    .trust-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      padding: 12px 14px;
+      border-radius: var(--radius-small);
+      color: var(--text-soft);
+      background: var(--accent-soft);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .advanced-settings { border: 1px solid var(--line); border-radius: var(--radius-small); background: var(--surface-strong); }
+    .advanced-settings summary { padding: 13px 14px; cursor: pointer; color: var(--text-soft); font-size: 12px; font-weight: 750; }
+    .advanced-settings-body { padding: 2px 14px 15px; }
+    details.compact { border: 1px solid var(--line); border-radius: var(--radius-small); background: var(--surface-strong); }
+    details.compact summary { padding: 12px 14px; font-size: 12px; font-weight: 750; cursor: pointer; }
+    details.compact p { margin: 0; padding: 0 14px 13px; color: var(--text-soft); font-size: 11px; line-height: 1.6; }
+    .advanced-settings > summary, details.compact:not(.module-editor) > summary, .source-details > summary, .advanced-links > summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      list-style: none;
+    }
+    .advanced-settings > summary::-webkit-details-marker, details.compact:not(.module-editor) > summary::-webkit-details-marker,
+    .source-details > summary::-webkit-details-marker, .advanced-links > summary::-webkit-details-marker { display: none; }
+    .advanced-settings > summary::after, details.compact:not(.module-editor) > summary::after,
+    .source-details > summary::after, .advanced-links > summary::after {
+      content: "›";
+      flex: 0 0 auto;
+      color: var(--text-faint);
+      font-size: 18px;
+      font-weight: 500;
+      line-height: 1;
+      transform: rotate(0deg);
+      transition: transform 140ms ease, color 140ms ease;
+    }
+    .advanced-settings[open] > summary::after, details.compact:not(.module-editor)[open] > summary::after,
+    .source-details[open] > summary::after, .advanced-links[open] > summary::after { color: var(--accent-strong); transform: rotate(90deg); }
+    details.step-help { border: 0; border-left: 2px solid var(--line-strong); border-radius: 0; background: transparent; }
+    details.step-help summary { justify-content: flex-start; padding: 3px 10px 5px; color: var(--text); }
+    details.step-help summary::after { margin-left: 2px; font-size: 16px; }
+    details.step-help p { padding: 0 10px 3px; }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      padding: 5px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-muted);
+    }
+    .segment {
+      min-height: 42px;
+      border: 0;
+      border-radius: var(--radius-small);
+      background: transparent;
+      color: var(--text-soft);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .segment.active { background: var(--surface-strong); color: var(--accent-strong); box-shadow: 0 1px 4px rgba(25, 50, 45, 0.10); }
+
+    .dropzone {
+      position: relative;
+      min-height: 210px;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      border: 1px dashed var(--line-strong);
+      border-radius: var(--radius);
+      background: var(--surface);
+      text-align: center;
+      transition: border-color 140ms ease, background 140ms ease;
+    }
+    .dropzone:hover, .dropzone.drag { border-color: var(--accent); background: var(--accent-soft); }
+    .dropzone input { position: absolute; inset: 0; min-height: 0; opacity: 0; cursor: pointer; }
+    .dropzone-title { font-size: 16px; font-weight: 750; }
+    .dropzone-copy { max-width: 420px; margin: 7px auto 0; color: var(--text-soft); font-size: 12px; line-height: 1.6; }
+    .dropzone-action { display: inline-block; margin-top: 14px; color: var(--accent-strong); font-size: 13px; font-weight: 750; }
+
+    .asset-list { display: grid; gap: 10px; }
+    .asset-row {
+      display: grid;
+      grid-template-columns: 86px minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      background: var(--surface);
+    }
+    .asset-thumb { width: 86px; height: 64px; object-fit: cover; border-radius: 8px; background: var(--surface-muted); }
+    .asset-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 750; }
+    .asset-meta { margin-top: 5px; color: var(--text-faint); font-size: 11px; }
+    .asset-state { color: var(--success); font-size: 11px; font-weight: 750; }
+
+    .choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .choice { position: relative; display: block; cursor: pointer; }
+    .choice input { position: absolute; opacity: 0; pointer-events: none; }
+    .choice-card {
+      display: block;
+      height: 100%;
+      min-width: 0;
+      padding: 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      background: var(--surface-strong);
+      transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease;
+    }
+    .choice:hover .choice-card { border-color: var(--line-strong); }
+    .choice input:checked + .choice-card { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); background: color-mix(in srgb, var(--accent-soft) 64%, var(--surface-strong)); }
+    .choice-title { display: block; font-size: 14px; font-weight: 800; }
+    .choice-copy { display: block; margin-top: 7px; color: var(--text-soft); font-size: 12px; line-height: 1.55; }
+    .choice-tag { display: block; margin-top: 12px; color: var(--accent-strong); font-size: 11px; font-weight: 750; }
+
+    .intent-summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 16px;
+      padding: 15px 16px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius);
+      background: color-mix(in srgb, var(--surface-muted) 72%, var(--surface-strong));
+    }
+    .intent-summary strong { display: block; font-size: 14px; }
+    .intent-summary .intent-copy > span:last-child { display: block; margin-top: 4px; color: var(--text-soft); font-size: 11px; line-height: 1.5; }
+    .intent-choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .intent-choices[hidden] { display: none; }
+    .intent-choice { position: relative; display: block; cursor: pointer; }
+    .intent-choice input { position: absolute; opacity: 0; pointer-events: none; }
+    .intent-choice-card { display: block; height: 100%; padding: 14px; border: 1px solid var(--line-strong); border-radius: var(--radius-small); background: var(--surface-strong); transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease; }
+    .intent-choice:hover .intent-choice-card { border-color: var(--accent); }
+    .intent-choice input:checked + .intent-choice-card { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); background: color-mix(in srgb, var(--accent-soft) 64%, var(--surface-strong)); }
+    .intent-choice-title { display: block; font-size: 13px; font-weight: 800; }
+    .intent-choice-copy { display: block; margin-top: 5px; color: var(--text-soft); font-size: 11px; line-height: 1.5; }
+    .intent-note { grid-column: 1 / -1; color: var(--text-faint); font-size: 11px; }
+
+    .visual-summary { display: grid; grid-template-columns: 92px minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 15px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-strong); }
+    .visual-summary .visual-swatch { width: 92px; height: 58px; }
+    .visual-summary-label { display: block; margin-bottom: 4px; color: var(--text-faint); font-size: 10px; font-weight: 750; }
+    .visual-summary strong { display: block; font-size: 14px; }
+    .visual-summary div > span:last-child { display: block; margin-top: 4px; color: var(--text-soft); font-size: 11px; line-height: 1.5; }
+
+    .auto-layout-card {
+      display: grid;
+      grid-template-columns: 112px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .auto-layout-card .visual-swatch { width: 112px; height: 66px; }
+    .auto-layout-copy strong { display: block; font-size: 14px; }
+    .auto-layout-copy span { display: block; margin-top: 5px; color: var(--text-soft); font-size: 11px; line-height: 1.55; }
+    .auto-layout-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+    .visual-swatch { height: 50px; display: grid; gap: 4px; padding: 4px; overflow: hidden; border: 1px solid rgba(22, 49, 44, 0.14); border-radius: 7px; background: #eef2f1; box-shadow: 0 2px 7px rgba(22, 49, 44, 0.08); }
+    .visual-swatch span { position: relative; overflow: hidden; border-radius: 3px; background: #ffffff; }
+    .visual-swatch span:first-child { background-color: #d4e1de; background-position: center; background-size: cover; }
+    .visual-swatch span:last-child::before, .visual-swatch span:last-child::after { content: ""; position: absolute; left: 16%; height: 2px; border-radius: 2px; background: rgba(16, 36, 32, 0.28); }
+    .visual-swatch span:last-child::before { top: 32%; width: 68%; }
+    .visual-swatch span:last-child::after { top: 58%; width: 48%; }
+    .visual-swatch.safe { grid-template-columns: 1fr 1fr; }
+    .visual-swatch.safe span:last-child { background: #f4f8f7; }
+    .visual-swatch.brand { grid-template-columns: 1fr; grid-template-rows: 2fr 1fr; background: #eef2f1; }
+    .visual-swatch.brand span:last-child { background: #176b61; }
+    .visual-swatch.brand span:last-child::before, .visual-swatch.brand span:last-child::after { background: rgba(255, 255, 255, 0.72); }
+    .visual-swatch.expressive { grid-template-columns: 1fr; grid-template-rows: 2fr 1fr; background: #e8f1f7; }
+    .visual-swatch.expressive span:last-child { background: #1f5f8b; }
+    .visual-swatch.expressive span:last-child::before, .visual-swatch.expressive span:last-child::after { background: rgba(255, 255, 255, 0.72); }
+    .layout-override { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+    .layout-override span { min-width: 0; }
+    .color-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .color-control { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-small); background: var(--surface); }
+    .color-control input[type="color"] { width: 38px; height: 38px; min-height: 38px; padding: 3px; border-radius: 8px; cursor: pointer; }
+    .color-control strong { display: block; font-size: 12px; }
+    .color-control span { display: block; margin-top: 3px; color: var(--text-faint); font-size: 10px; }
+
+    .visual-studio { position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column; overflow: hidden; color: var(--text); background: var(--bg); }
+    .visual-studio-head { position: relative; z-index: 2; flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 68px; padding: 12px 24px; border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 94%, transparent); backdrop-filter: blur(18px); }
+    .visual-studio-title { margin: 0; font-size: 19px; letter-spacing: 0; }
+    .visual-studio-subtitle { margin: 3px 0 0; color: var(--text-soft); font-size: 11px; }
+    .visual-studio-body { width: 100%; max-width: 1480px; min-height: 0; margin: 0 auto; flex: 1 1 auto; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 12px; padding: 16px 20px 20px; overflow: hidden; }
+    .visual-studio-commandbar { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+    .visual-studio-commandbar .visual-swatch { width: 64px; height: 40px; }
+    .visual-studio-lower { min-height: 0; display: grid; grid-template-columns: minmax(300px, 0.58fr) minmax(600px, 1.42fr); gap: 14px; align-items: stretch; }
+    .visual-studio-controls { min-height: 0; display: grid; align-content: start; gap: 18px; padding-right: 6px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+    .visual-studio-controls > .panel { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; }
+    .visual-studio-controls > .panel.panel-body { padding: 10px 4px 16px; }
+    .visual-studio-section { display: grid; gap: 11px; }
+    .visual-studio-section h3 { margin: 0; font-size: 14px; }
+    .visual-studio-section p { margin: 0; color: var(--text-soft); font-size: 11px; line-height: 1.55; }
+    .visual-studio-preview { min-width: 0; min-height: 0; display: flex; flex-direction: column; padding: 12px; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-muted); }
+    .visual-studio-preview-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .visual-studio-preview-head strong { font-size: 12px; }
+    .visual-studio-frame { width: 660px; max-width: 100%; min-height: 0; margin: 0 auto; flex: 1 1 auto; overflow: hidden; border: 1px solid var(--line-strong); border-radius: var(--radius-small); background: #eef1f0; box-shadow: var(--shadow); transition: width 180ms ease; }
+    .visual-studio-frame.mobile { width: 390px; }
+    .visual-studio-frame iframe { width: 100%; height: 100%; border: 0; background: #eef1f0; }
+    .compatibility-note { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; padding: 12px 13px; border-left: 3px solid var(--accent); border-radius: var(--radius-small); color: var(--text-soft); background: var(--surface-muted); font-size: 11px; line-height: 1.55; }
+    .compatibility-note strong { color: var(--text); }
+    .studio-module-list { display: grid; gap: 8px; }
+    .studio-module-row {
+      display: grid;
+      grid-template-columns: 50px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-small);
+      background: var(--surface);
+    }
+    .studio-module-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; background: var(--surface-muted); }
+    .studio-module-main { min-width: 0; display: grid; gap: 7px; }
+    .studio-module-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 800; }
+    .studio-module-tools { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px; align-items: center; }
+    .studio-module-tools select { min-height: 32px; padding: 5px 26px 5px 8px; font-size: 11px; }
+    .studio-module-order { display: flex; gap: 5px; }
+
+    .module-list { display: grid; gap: 12px; }
+    .module-item { display:grid; grid-template-columns:120px minmax(0,1fr); gap:16px; padding: 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+    .module-editor { display: block; padding: 0; overflow: hidden; }
+    .module-editor-summary {
+      display: grid;
+      grid-template-columns: 76px minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 12px;
+      cursor: pointer;
+      list-style: none;
+    }
+    .module-editor-summary::-webkit-details-marker { display: none; }
+    .module-editor-summary::after { content: "编辑"; color: var(--accent-strong); font-size: 11px; font-weight: 800; }
+    .module-editor[open] .module-editor-summary::after { content: "收起"; }
+    .module-summary-thumb { width: 76px; height: 58px; object-fit: cover; border-radius: 8px; background: var(--surface-muted); }
+    .module-summary-copy { min-width: 0; }
+    .module-summary-copy span { display: block; color: var(--text-faint); font-size: 10px; font-weight: 750; }
+    .module-summary-copy strong { display: block; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+    .module-editor-body { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 16px; padding: 16px; border-top: 1px solid var(--line); }
+    .module-thumb { width:120px; height:120px; object-fit:cover; border-radius:var(--radius-small); background:var(--surface-muted); }
+    .module-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 13px; }
+    .module-head > div { display: flex; align-items: baseline; gap: 10px; }
+    .module-name { font-size: 13px; font-weight: 800; }
+    .module-status { color: var(--success); font-size: 11px; font-weight: 700; }
+    .module-content { min-width: 0; display: grid; gap: 14px; }
+    .module-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .module-order { color: var(--text-soft); font-size: 12px; font-weight: 800; }
+    .module-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
+    .layout-control { display: flex; align-items: center; gap: 7px; color: var(--text-soft); font-size: 11px; font-weight: 700; }
+    .layout-control select { width: auto; min-width: 112px; min-height: 34px; padding: 6px 28px 6px 9px; font-size: 12px; }
+    .module-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+
+    .link-list { display: grid; gap: 14px; }
+    .link-card {
+      display: grid;
+      grid-template-columns: 112px minmax(0, 1fr);
+      gap: 16px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .link-visual { width: 112px; height: 112px; object-fit: cover; border-radius: var(--radius-small); background: var(--surface-muted); }
+    .link-card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .link-card-title { font-size: 14px; font-weight: 800; }
+    .link-status { padding: 5px 8px; border-radius: 8px; color: var(--text-faint); background: var(--surface-muted); font-size: 10px; font-weight: 800; }
+    .link-status.ok { color: var(--success); background: color-mix(in srgb, var(--success) 14%, transparent); }
+    .link-status.warn { color: var(--warning); background: color-mix(in srgb, var(--warning) 14%, transparent); }
+    .link-status.error { color: var(--danger); background: color-mix(in srgb, var(--danger) 14%, transparent); }
+    .link-options { display: flex; align-items: center; gap: 9px; margin-top: 12px; color: var(--text-soft); font-size: 12px; font-weight: 700; }
+    .link-options input { width: 17px; height: 17px; accent-color: var(--accent); }
+    .advanced-links { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+    .final-url { margin-top: 10px; padding: 10px 12px; overflow: hidden; border-radius: var(--radius-small); background: var(--surface-muted); color: var(--text-faint); font-size: 11px; line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
+
+    .check-list { display: grid; gap: 8px; }
+    .check-item {
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 13px;
+      border-radius: var(--radius-small);
+      background: var(--surface-muted);
+    }
+    .check-mark {
+      width: 20px;
+      height: 20px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      color: var(--success);
+      background: color-mix(in srgb, var(--success) 15%, transparent);
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .check-mark.warn { color: var(--warning); background: color-mix(in srgb, var(--warning) 15%, transparent); }
+    .check-label { font-size: 12px; font-weight: 700; }
+    .check-detail { color: var(--text-faint); font-size: 11px; text-align: right; }
+
+    .preview-stage { padding: 8px; overflow: hidden; background: var(--surface-muted); }
+    .preview-toolbar { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 8px 12px; margin-bottom: 10px; }
+    .preview-switch, .studio-switch { display: flex; gap: 7px; }
+    .preview-tools { min-width: 0; display: flex; justify-content: flex-end; gap: 7px; }
+    .preview-switch button, .studio-switch button, .preview-tool {
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--surface-strong);
+      color: var(--text-soft);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .preview-switch button.active, .studio-switch button.active, .preview-tool.active { border-color: var(--accent); color: var(--accent-strong); background: var(--surface-strong); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent); }
+    .preview-status { grid-column: 1 / -1; color: var(--text-faint); font-size: 11px; line-height: 16px; text-align: left; }
+    .preview-status.ok { color: var(--success); }
+    .preview-status.warn { color: var(--warning); }
+    .preview-window {
+      width: min(100%, 660px);
+      min-width: 0;
+      max-width: 660px;
+      height: 720px;
+      margin: 0 auto;
+      overflow: hidden;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-small);
+      background: #eef1f0;
+      box-shadow: var(--shadow);
+      transition: max-width 180ms ease;
+    }
+    .preview-window.mobile { min-width: 0; max-width: 390px; height: 680px; }
+    .preview-window.dark-simulation { background: #121918; border-color: #526561; }
+    .preview-window iframe { display: block; width: 100%; height: 100%; border: 0; background: #eef1f0; overscroll-behavior: contain; }
+    .preview-empty { min-height: 520px; display: grid; place-items: center; padding: 30px; text-align: center; color: var(--text-faint); }
+    .preview-empty strong { display: block; color: var(--text); font-size: 15px; margin-bottom: 6px; }
+
+    .metric-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .metric { padding: 13px; border-radius: var(--radius-small); background: var(--surface-muted); }
+    .metric-value { font-size: 19px; font-weight: 800; letter-spacing: 0; }
+    .metric-label { margin-top: 4px; color: var(--text-faint); font-size: 10px; }
+    .summary-list { display: grid; gap: 10px; }
+    .summary-row { display: flex; justify-content: space-between; gap: 16px; color: var(--text-soft); font-size: 12px; }
+    .summary-row strong { color: var(--text); font-weight: 750; text-align: right; }
+    .summary-hero { padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; }
+    .summary-kicker { color: var(--accent-strong); font-size: 11px; font-weight: 800; }
+    .summary-heading { display: block; margin-top: 5px; font-size: 17px; line-height: 1.35; }
+    .progress-track { height: 3px; margin-top: 12px; overflow: hidden; border-radius: 3px; background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
+    .progress-fill { height: 100%; width: 16.667%; border-radius: inherit; background: var(--accent-strong); transition: width 180ms ease; }
+    .summary-next { padding-top: 14px; border-top: 1px solid var(--line); color: var(--text-faint); font-size: 11px; }
+    .summary-next strong { display: block; margin-top: 4px; color: var(--text); font-size: 13px; }
+    .source-details { border: 1px solid var(--line); border-radius: var(--radius-small); background: var(--surface); }
+    .source-details summary { padding: 13px 14px; cursor: pointer; color: var(--text-soft); font-size: 12px; font-weight: 750; }
+    .source-details-body { padding: 0 14px 14px; }
+
+    .hero-asset-pair { display: grid; grid-template-columns: 148px minmax(0, 1fr); gap: 14px; align-items: center; }
+    .hero-asset-preview { width: 148px; height: 98px; object-fit: cover; border-radius: var(--radius-small); background: var(--surface-muted); }
+    .export-mode-notice { border-left-color: var(--warning); background: var(--warning-soft); }
+    .confirm-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(7, 14, 13, 0.48);
+    }
+    .confirm-dialog { width: min(440px, 100%); padding: 24px; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--surface-strong); box-shadow: var(--shadow); }
+    .confirm-dialog h2 { margin: 0; font-size: 20px; }
+    .confirm-dialog p { margin: 9px 0 20px; color: var(--text-soft); font-size: 13px; line-height: 1.65; }
+    .confirm-actions { display: flex; justify-content: flex-end; gap: 10px; }
+    .check-mark.pending { color: var(--text-faint); background: var(--surface-muted); }
+
+    .footer-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+    }
+    .footer-right { display: flex; gap: 10px; }
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 50;
+      max-width: 360px;
+      padding: 13px 15px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-small);
+      color: var(--text);
+      background: var(--surface-strong);
+      box-shadow: var(--shadow);
+      font-size: 12px;
+      line-height: 1.5;
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    @media (min-width: 1121px) {
+      html, body { height: 100%; overflow: hidden; }
+      .app { height: 100dvh; overflow: hidden; }
+      .topbar { position: relative; }
+      .layout { height: calc(100dvh - 64px); min-height: 0; }
+      .main { height: calc(100dvh - 64px); min-height: 0; overflow: hidden; }
+      .layout.preview-focus .main { padding-top: 18px; padding-right: 18px; padding-bottom: 18px; padding-left: 18px; }
+      .main-inner { height: 100%; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); }
+      .layout.preview-focus .page-head { margin-bottom: 13px; }
+      .layout.preview-focus .page-title { font-size: 32px; }
+      .layout.preview-focus .page-copy { margin-top: 5px; }
+      .workspace { min-height: 0; align-items: stretch; }
+      .workspace > .panel { height: 100%; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+      .workspace > section.panel > .step-panel.active { min-height: 100%; display: flex; flex-direction: column; }
+      .workspace > section.panel > .step-panel.active > .panel-body.stack { flex: 1 0 auto; display: flex; flex-direction: column; }
+      .workspace > section.panel > .step-panel.active > .panel-body.stack > .footer-actions { margin-top: auto; }
+      .workspace:not(.preview-mode) > .sticky-preview {
+        height: auto;
+        align-self: start;
+        overflow: visible;
+        border: 0;
+        border-left: 1px solid var(--line);
+        border-radius: 0;
+        background: transparent;
+      }
+      .workspace:not(.preview-mode) > .sticky-preview > .panel-head { display: none; }
+      .workspace:not(.preview-mode) #summaryPreview .panel-body { padding: 0 0 0 18px; gap: 14px; }
+      .sticky-preview { position: static; top: auto; }
+      .workspace.preview-mode > .sticky-preview { display: flex; flex-direction: column; overflow: hidden; scrollbar-gutter: auto; }
+      .workspace.preview-mode > .sticky-preview > .panel-head { flex: 0 0 auto; padding-top: 14px; padding-bottom: 14px; }
+      .workspace.preview-mode > .sticky-preview > .preview-stage { min-height: 0; flex: 1 1 auto; display: flex; flex-direction: column; overflow: hidden; }
+      .workspace.preview-mode .preview-toolbar { flex: 0 0 auto; }
+      .workspace.preview-mode .preview-window { min-height: 0; flex: 1 1 auto; height: auto; }
+    }
+
+    @media (min-width: 1121px) and (max-width: 1280px) {
+      .layout.preview-focus { grid-template-columns: 72px minmax(0, 1fr); }
+      .layout.preview-focus:not(.sidebar-collapsed) .sidebar {
+        position: fixed;
+        left: 0;
+        z-index: 30;
+        width: 224px;
+        box-shadow: 18px 0 38px rgba(34, 61, 57, 0.14);
+      }
+    }
+
+    @media (max-width: 1120px) {
+      .workspace { grid-template-columns: 1fr; }
+      .workspace.preview-mode { grid-template-columns: 1fr; }
+      .sticky-preview { position: static; order: -1; }
+      .preview-window { height: 650px; }
+      .visual-studio { display: block; overflow-y: auto; }
+      .visual-studio-head { position: sticky; top: 0; }
+      .visual-studio-body { display: grid; grid-template-rows: none; overflow: visible; }
+      .visual-studio-lower { grid-template-columns: 1fr; }
+      .visual-studio-controls { overflow: visible; padding-right: 0; }
+      .visual-studio-preview { order: -1; min-height: 620px; }
+      .visual-studio-frame { height: 560px; flex: 0 0 auto; }
+    }
+    @media (max-width: 760px) {
+      .topbar { height: 62px; padding: 0 16px; }
+      .brand-sub, .session-note, .save-state { display: none; }
+      .layout, .layout.sidebar-collapsed { grid-template-columns: 1fr; min-height: calc(100dvh - 62px); }
+      .sidebar {
+        position: sticky;
+        top: 62px;
+        z-index: 15;
+        height: auto;
+        padding: 10px 12px;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+        overflow-x: auto;
+        overflow-y: hidden;
+      }
+      .sidebar-head, .sidebar-title, .sidebar-foot { display: none; }
+      .steps { display: flex; width: max-content; gap: 6px; }
+      .step-button { width: auto; grid-template-columns: 26px auto; padding: 8px 10px; }
+      .step-index { width: 24px; height: 24px; border-radius: 8px; }
+      .step-desc { display: none; }
+      .main { padding: 22px 14px 28px; }
+      .page-title { font-size: 26px; }
+      .page-head {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: start;
+        gap: 7px 12px;
+        margin-bottom: 18px;
+      }
+      .page-head > div:first-child { display: contents; }
+      .page-title { grid-column: 1; grid-row: 1; }
+      .page-copy { grid-column: 1 / -1; grid-row: 2; max-width: none; margin-top: 0; }
+      .page-meta { grid-column: 2; grid-row: 1; align-items: flex-end; flex-direction: column; gap: 6px; }
+      .demo-badge { display: none; }
+      .workspace, .field-grid, .choice-grid { grid-template-columns: 1fr; }
+      .intent-choices { grid-template-columns: 1fr; }
+      .intent-summary { grid-template-columns: 1fr; }
+      .intent-summary .button { width: 100%; }
+      .color-controls { grid-template-columns: 1fr; }
+      .visual-summary { grid-template-columns: 76px minmax(0, 1fr); }
+      .visual-summary .visual-swatch { width: 76px; }
+      .visual-summary .button { grid-column: 1 / -1; width: 100%; }
+      .visual-studio-head { padding: 10px 14px; }
+      .visual-studio-body { padding: 14px; }
+      .visual-studio-commandbar { grid-template-columns: 52px minmax(0, 1fr); padding: 8px 0 12px; }
+      .visual-studio-commandbar .visual-swatch { width: 52px; }
+      .visual-studio-commandbar .auto-layout-actions { grid-column: 1 / -1; justify-content: stretch; }
+      .visual-studio-commandbar .auto-layout-actions .button { flex: 1; }
+      .visual-studio-preview { min-height: 0; }
+      .visual-studio-frame { height: 520px; }
+      .auto-layout-card { grid-template-columns: 82px minmax(0, 1fr); }
+      .auto-layout-card .visual-swatch { width: 82px; }
+      .auto-layout-actions { grid-column: 1 / -1; justify-content: stretch; }
+      .auto-layout-actions .button { flex: 1; }
+      .panel-body { padding: 18px; }
+      .panel-head { padding: 17px 18px; }
+      .asset-row { grid-template-columns: 72px minmax(0, 1fr); }
+      .module-item { grid-template-columns: 1fr; }
+      .module-editor-summary { grid-template-columns: 60px minmax(0, 1fr) auto; gap: 10px; }
+      .module-summary-thumb { width: 60px; height: 48px; }
+      .module-editor-body { grid-template-columns: 1fr; padding: 14px; }
+      .module-thumb { width:100%; height:170px; }
+      .link-card { grid-template-columns: 1fr; }
+      .link-visual { width: 100%; height: 160px; }
+      .asset-thumb { width: 72px; height: 56px; }
+      .asset-state { grid-column: 2; }
+      .metric-row { grid-template-columns: 1fr; }
+      .footer-actions { align-items: stretch; }
+      .footer-right { width: 100%; }
+      .footer-actions, .footer-right { flex-direction: column; }
+      .footer-actions .button, .footer-right .button { width: 100%; }
+      .step-panel.active > .panel-body > .footer-actions {
+        position: sticky;
+        bottom: 0;
+        z-index: 12;
+        margin: 4px -18px -18px;
+        padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+        border-top: 1px solid var(--line);
+        background: color-mix(in srgb, var(--surface-strong) 96%, transparent);
+        box-shadow: 0 -12px 28px rgba(34, 61, 57, 0.08);
+        backdrop-filter: blur(14px);
+      }
+      .step-panel.active > .panel-body > .footer-actions {
+        flex-direction: row;
+      }
+      .step-panel.active > .panel-body > .footer-actions > .button,
+      .step-panel.active > .panel-body > .footer-actions > .footer-right {
+        flex: 1;
+        width: auto;
+      }
+      .step-panel.active > .panel-body > .footer-actions > .footer-right {
+        flex-direction: row;
+      }
+      .step-panel[data-panel="5"].active > .panel-body > .footer-actions {
+        position: static;
+        flex-direction: column;
+        margin: 20px 0 0;
+        padding: 20px 0 0;
+        box-shadow: none;
+        backdrop-filter: none;
+      }
+      .step-panel[data-panel="5"].active > .panel-body > .footer-actions > .footer-right {
+        width: 100%;
+        flex-direction: column;
+      }
+      .hero-asset-pair { grid-template-columns: 1fr; }
+      .hero-asset-preview { width: 100%; height: 160px; }
+      .confirm-actions { flex-direction: column-reverse; }
+      .confirm-actions .button { width: 100%; }
+      .preview-window { height: 560px; }
+      .preview-toolbar { grid-template-columns: 1fr; align-items: stretch; }
+      .preview-tools { justify-content: flex-start; }
+      .preview-status { grid-column: 1; }
+      .toast { right: 14px; bottom: 14px; left: 14px; max-width: none; }
+      #summaryPreview .summary-list, #summaryPreview .summary-next { display: none; }
+      .sticky-preview > .panel-head { display: none; }
+      #summaryPreview .panel-body { padding: 12px; }
+      #summaryPreview .summary-hero { padding: 13px 14px; }
+      #summaryPreview .summary-heading { font-size: 14px; }
+      #summaryPreview .progress-track { margin-top: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">邮</div>
+        <div>
+          <div class="brand-name">邮件工坊</div>
+          <div class="brand-sub">营销邮件生成与兼容性检查</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span class="save-state" id="saveState">草稿保存在本机</span>
+        <button class="button ghost small" id="newEmail" type="button">新建邮件</button>
+        <button class="icon-button" id="themeToggle" type="button" aria-label="切换到深色模式" title="切换到深色模式"><span aria-hidden="true">☾</span></button>
+      </div>
+    </header>
+
+    <div class="layout" id="appLayout">
+      <aside class="sidebar" aria-label="制作流程">
+        <div class="sidebar-head">
+          <div class="sidebar-title">营销邮件制作</div>
+          <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="收起制作流程" aria-expanded="true" title="收起制作流程"><span aria-hidden="true">‹</span></button>
+        </div>
+        <nav class="steps" id="stepNav">
+          <button class="step-button active" type="button" data-step="0" title="连接模型">
+            <span class="step-index">1</span><span class="step-label">连接模型<span class="step-desc">使用个人额度</span></span>
+          </button>
+          <button class="step-button" type="button" data-step="1" title="整理素材">
+            <span class="step-index">2</span><span class="step-label">整理素材<span class="step-desc">长图或独立图片</span></span>
+          </button>
+          <button class="step-button" type="button" data-step="2" title="确认内容">
+            <span class="step-index">3</span><span class="step-label">确认内容<span class="step-desc">文案与图片方式</span></span>
+          </button>
+          <button class="step-button" type="button" data-step="3" title="配置链接">
+            <span class="step-index">4</span><span class="step-label">配置链接<span class="step-desc">跳转与追踪参数</span></span>
+          </button>
+          <button class="step-button" type="button" data-step="4" title="生成预览">
+            <span class="step-index">5</span><span class="step-label">生成预览<span class="step-desc">桌面与移动端</span></span>
+          </button>
+          <button class="step-button" type="button" data-step="5" title="检查导出">
+            <span class="step-index">6</span><span class="step-label">检查导出<span class="step-desc">风险确认与源码</span></span>
+          </button>
+        </nav>
+        <div class="sidebar-foot">工具负责生成和检查。优惠真实性、素材授权、链接有效期及图片地址由提交人确认。</div>
+      </aside>
+
+      <main class="main">
+        <div class="main-inner">
+          <div class="page-head">
+            <div>
+              <h1 class="page-title" id="pageTitle">连接你的模型额度</h1>
+              <p class="page-copy" id="pageCopy">使用个人 API Key 连接模型，费用计入个人额度。</p>
+            </div>
+            <div class="page-meta">
+              <span class="step-counter" id="stepCounter" aria-live="polite">第1步，共6步</span>
+              <span class="demo-badge">本地 Demo</span>
+            </div>
+          </div>
+
+          <div class="workspace">
+            <section class="panel">
+              <div class="step-panel active" data-panel="0">
+                <div class="panel-head">
+                  <h2 class="panel-title">个人模型连接</h2>
+                  <p class="panel-copy">API Key 只在本次会话中使用，不保存。</p>
+                </div>
+                <div class="panel-body stack">
+                  <details class="compact step-help" open><summary>本步怎么做</summary><p>粘贴 API Key 并检测，或直接进入演示。Demo不会发起真实请求。</p></details>
+                  <div class="field-grid single">
+                    <div class="field">
+                      <label for="personalToken">个人 API Key</label>
+                      <div class="input-row">
+                        <input id="personalToken" type="password" placeholder="粘贴个人 API Key" autocomplete="off" spellcheck="false" aria-describedby="tokenError">
+                        <button class="button secondary" id="testToken" type="button">检测连接</button>
+                      </div>
+                      <div class="helper">Demo不发送真实请求，可直接使用演示模式。</div>
+                      <div class="error" id="tokenError">请输入个人 API Key，或使用演示模式。</div>
+                    </div>
+                  </div>
+                  <div class="trust-line" aria-label="API Key 安全说明">
+                    <span>仅本次会话</span>
+                    <span>不写入HTML</span>
+                    <span>使用个人额度</span>
+                  </div>
+                  <details class="advanced-settings">
+                    <summary>高级设置</summary>
+                    <div class="advanced-settings-body">
+                      <div class="field-grid single">
+                        <div class="field">
+                          <label for="apiEndpoint">模型服务地址</label>
+                          <input id="apiEndpoint" type="url" value="https://company-ai.example.com/v1" autocomplete="off">
+                          <div class="helper">线上版本由管理员预设，业务人员通常无需修改。</div>
+                        </div>
+                        <div class="field">
+                          <label for="modelSelect">使用模型</label>
+                          <select id="modelSelect">
+                            <option>公司默认视觉理解模型</option>
+                            <option>公司默认文本生成模型</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </details>
+                  <details class="compact"><summary>安全说明</summary><p>线上版由后端临时转发模型请求。API Key 不进入草稿、日志或导出文件，任务结束后清除。</p></details>
+                  <div class="footer-actions">
+                    <button class="button ghost" id="demoMode" type="button">进入演示</button>
+                    <div class="footer-right"><button class="button next" type="button" data-next="1">继续整理素材</button></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="step-panel" data-panel="1">
+                <div class="panel-head">
+                  <h2 class="panel-title">上传并整理图片素材</h2>
+                  <p class="panel-copy">独立图片效果最好。只有长图时，工具会提取文案并生成候选裁切。</p>
+                </div>
+                <div class="panel-body stack">
+                  <details class="compact step-help" open><summary>本步怎么做</summary><p>优先上传独立图片。拆出的新图片需自行上传并取得外链。</p></details>
+                  <div class="segmented" role="group" aria-label="素材方式">
+                    <button class="segment active" type="button" aria-pressed="true" data-mode="poster">上传营销长图</button>
+                    <button class="segment" type="button" aria-pressed="false" data-mode="assets">上传独立图片</button>
+                  </div>
+                  <label class="dropzone" id="dropzone">
+                    <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp">
+                    <span>
+                      <span class="dropzone-title" id="dropTitle">拖入一张营销长图</span>
+                      <span class="dropzone-copy" id="dropCopy">支持PNG、JPG和WebP，单张不超过15MB。选择后先在浏览器本地压缩，再用于识别。</span>
+                      <span class="dropzone-action">选择图片</span>
+                    </span>
+                  </label>
+                  <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="button secondary" id="loadSample" type="button">载入轻旅行示例</button>
+                    <button class="button ghost" id="clearAssets" type="button">清空素材</button>
+                  </div>
+                  <div class="asset-list" id="assetList">
+                    <div class="notice"><strong>等待素材</strong><span>载入示例可以立即体验后续流程。</span></div>
+                  </div>
+                  <div class="notice warning" id="materialWarning">
+                    <strong>图片上已经压入文字时</strong>
+                    <span>工具无法恢复被文字遮挡的原始画面，只能保留该区域或提示上传原图替换。</span>
+                  </div>
+                  <div class="footer-actions">
+                    <button class="button ghost prev" type="button" data-prev="0">返回</button>
+                    <div class="footer-right"><button class="button next" type="button" data-next="2">确认邮件内容</button></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="step-panel" data-panel="2">
+                <div class="panel-head">
+                  <h2 class="panel-title">确认邮件内容</h2>
+                  <p class="panel-copy">核对可读正文，并填写图片的公开HTTPS地址。</p>
+                </div>
+                <div class="panel-body stack">
+                  <details class="compact step-help" open><summary>本步怎么做</summary><p>核对主题、发送主体和正文。重要信息不要只写在图片里。</p></details>
+                  <div class="intent-summary">
+                    <div class="intent-copy">
+                      <span class="visual-summary-label">系统理解</span>
+                      <strong id="contentIntentName">以内容灵感为主</strong>
+                      <span id="contentIntentCopy">将优先使用大图、可读正文和图文交错。</span>
+                    </div>
+                    <button class="button ghost small" id="toggleContentIntent" type="button" aria-expanded="false" aria-controls="contentIntentChoices">调整理解</button>
+                  </div>
+                  <div class="intent-choices" id="contentIntentChoices" hidden>
+                    <label class="intent-choice">
+                      <input type="radio" name="contentIntent" value="inspiration" checked>
+                      <span class="intent-choice-card"><span class="intent-choice-title">看内容、找灵感</span><span class="intent-choice-copy">目的地、攻略和旅行主题</span></span>
+                    </label>
+                    <label class="intent-choice">
+                      <input type="radio" name="contentIntent" value="product">
+                      <span class="intent-choice-card"><span class="intent-choice-title">比价格、选产品</span><span class="intent-choice-copy">酒店、航班、线路和价格</span></span>
+                    </label>
+                    <label class="intent-choice">
+                      <input type="radio" name="contentIntent" value="promotion">
+                      <span class="intent-choice-card"><span class="intent-choice-title">领优惠、参加活动</span><span class="intent-choice-copy">大促、优惠券和支付权益</span></span>
+                    </label>
+                    <span class="intent-note">只影响默认排版，不限制内容混排。</span>
+                  </div>
+                  <div class="visual-summary">
+                    <span class="visual-swatch brand" id="visualSummarySwatch" aria-hidden="true"><span></span><span></span></span>
+                    <div><span class="visual-summary-label">视觉排版</span><strong id="currentVisualName">已自动生成</strong><span id="currentVisualCopy">系统根据当前内容安排图片、文字和阅读顺序。</span></div>
+                    <button class="button secondary" id="openVisualStudio" type="button">调整视觉</button>
+                  </div>
+                  <div class="field-grid">
+                    <div class="field full">
+                      <label for="subject">邮件主题</label>
+                      <input id="subject" value="(AD) 一份轻松出发的夏日灵感" required aria-describedby="subjectError">
+                      <div class="helper">商业推广邮件的实际主题需在发送平台中单独填写。</div>
+                      <div class="error" id="subjectError">营销邮件主题必须以(AD)开头。</div>
+                    </div>
+                    <div class="field full">
+                      <label for="preheader">预览摘要</label>
+                      <input id="preheader" value="去海边吹风，到山野散步，把周末留给喜欢的风景。">
+                    </div>
+                    <div class="field">
+                      <label for="companyName">发送主体</label>
+                      <input id="companyName" value="远屿旅行" required aria-describedby="companyNameError">
+                      <div class="error" id="companyNameError">请填写发送主体。</div>
+                    </div>
+                    <div class="field">
+                      <label for="emailLabel">邮件栏目</label>
+                      <input id="emailLabel" value="轻旅行灵感">
+                    </div>
+                    <div class="field full">
+                      <label for="serviceLine">客服热线</label>
+                      <input id="serviceLine" value="{{service_phone}}">
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="module-head">
+                      <div><span class="module-name">内容模块</span><span class="module-status" id="moduleCountStatus"></span></div>
+                      <button class="button secondary small" id="addModule" type="button">添加模块</button>
+                    </div>
+                    <div class="helper" style="margin:-5px 0 12px;">先核对模块标题，需要修改时再展开。图片地址与对应内容放在一起。</div>
+                    <div class="module-list" id="contentModuleList"></div>
+                  </div>
+
+                  <div class="field-grid single">
+                    <div class="module-head"><span class="module-name">头图与图片外链</span><span class="module-status">必须填写</span></div>
+                    <div class="hero-asset-pair">
+                      <img class="hero-asset-preview" id="heroAssetPreview" src="assets/demo/hero.jpg" alt="邮件头图预览">
+                      <div class="field"><label for="heroUrl">头图公开HTTPS地址</label><input id="heroUrl" type="url" value="https://assets.example.com/email-demo/hero.jpg" required aria-describedby="heroUrlError"><div class="helper">工具不代为上传。正式地址必须公开可访问。</div><div class="error" id="heroUrlError">请填写公开可访问的HTTPS图片地址。</div></div>
+                    </div>
+                  </div>
+                  <div class="footer-actions">
+                    <button class="button ghost prev" type="button" data-prev="1">返回</button>
+                    <div class="footer-right"><button class="button next" type="button" data-next="3">配置跳转链接</button></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="step-panel" data-panel="3">
+                <div class="panel-head">
+                  <h2 class="panel-title">配置邮件跳转链接</h2>
+                  <p class="panel-copy">每个内容模块单独管理。默认让图片、标题和按钮跳向同一页面。</p>
+                </div>
+                <div class="panel-body stack">
+                  <details class="compact step-help" open><summary>本步怎么做</summary><p>填写正式HTTPS链接，不使用短链、测试地址或需要登录的页面。</p></details>
+                  <div class="notice">
+                    <strong>系统会自动补充邮件追踪参数</strong>
+                    <span>一般只需填写落地页地址。正式版还需由服务端检查重定向链路和页面状态。</span>
+                  </div>
+                  <details class="advanced-settings" id="trackingSettings">
+                    <summary>追踪参数设置</summary>
+                    <div class="advanced-settings-body">
+                      <div class="field">
+                        <label for="campaignCode">活动追踪标识</label>
+                        <input id="campaignCode" value="summer-inspiration" spellcheck="false">
+                        <div class="helper">系统已自动生成。需要和内部活动编号对应时再修改。</div>
+                        <div class="error" id="campaignCodeError">请输入正确的活动追踪标识。</div>
+                      </div>
+                    </div>
+                  </details>
+                  <div class="link-list" id="linkModuleList"></div>
+                  <div class="check-list">
+                    <div class="check-item"><span class="check-mark" id="linkHttpsMark">✓</span><span class="check-label">HTTPS与地址格式</span><span class="check-detail" id="linkHttpsDetail">等待检查</span></div>
+                    <div class="check-item"><span class="check-mark warn" id="linkRiskMark">!</span><span class="check-label">短链、测试域名与敏感参数</span><span class="check-detail" id="linkRiskDetail">等待检查</span></div>
+                    <div class="check-item"><span class="check-mark warn">!</span><span class="check-label">重定向与落地页存活状态</span><span class="check-detail">正式版服务端检测</span></div>
+                  </div>
+                  <div class="helper" id="linkRiskReasons" hidden></div>
+                  <div class="footer-actions">
+                    <button class="button ghost prev" type="button" data-prev="2">返回</button>
+                    <div class="footer-right"><button class="button" id="generatePreview" type="button">检查并生成预览</button></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="step-panel" data-panel="4">
+                <div class="panel-head">
+                  <h2 class="panel-title">查看邮件预览效果</h2>
+                  <p class="panel-copy">这里预览生成结果。最终仍需向QQ、网易和新浪测试邮箱各发送一封。</p>
+                </div>
+                <div class="panel-body stack">
+                  <details class="compact step-help" open><summary>本步怎么做</summary><p>切换桌面端和移动端。图片被隐藏时，正文和按钮也应可读。</p></details>
+                  <div class="metric-row">
+                    <div class="metric"><div class="metric-value">600px</div><div class="metric-label">桌面端邮件宽度</div></div>
+                    <div class="metric"><div class="metric-value" id="metricImageCount">3张</div><div class="metric-label">邮件图片</div></div>
+                    <div class="metric"><div class="metric-value" id="metricModuleCount">2段</div><div class="metric-label">内容模块</div></div>
+                  </div>
+                  <div class="check-list">
+                    <div class="check-item"><span class="check-mark">✓</span><span class="check-label">桌面与移动端自适应布局</span><span class="check-detail">已生成</span></div>
+                    <div class="check-item"><span class="check-mark">✓</span><span class="check-label">图片失败时保留替代文字</span><span class="check-detail" id="altTextCount">3/3</span></div>
+                    <div class="check-item"><span class="check-mark warn">!</span><span class="check-label">示例图片仅用于界面演示</span><span class="check-detail">发送前替换</span></div>
+                  </div>
+                  <div class="notice"><strong>预览不等于真实收件效果</strong><span>邮箱客户端可能重写样式或拦截外链图片。真实发送测试是导出前的必要确认。</span></div>
+                  <div class="footer-actions">
+                    <button class="button ghost prev" type="button" data-prev="3">返回</button>
+                    <div class="footer-right"><button class="button next" type="button" data-next="5">检查并导出</button></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="step-panel" data-panel="5">
+                <div class="panel-head">
+                  <h2 class="panel-title">检查结果和导出</h2>
+                  <p class="panel-copy">导出前确认风险。工具不会替业务提交人判断优惠真实性或素材授权。</p>
+                </div>
+                <div class="panel-body stack">
+                  <details class="compact step-help" open><summary>本步怎么做</summary><p>补齐公司信息和退订链接，确认后下载HTML并完成试发。</p></details>
+                  <div class="check-list">
+                    <div class="check-item"><span class="check-mark">✓</span><span class="check-label">HTML结构完整，无脚本和表单</span><span class="check-detail">通过</span></div>
+                    <div class="check-item"><span class="check-mark">✓</span><span class="check-label">存在可读正文和图片替代文字</span><span class="check-detail">通过</span></div>
+                    <div class="check-item"><span class="check-mark">✓</span><span class="check-label">活动跳转链接已分组并补充追踪参数</span><span class="check-detail">格式通过</span></div>
+                    <div class="check-item"><span class="check-mark pending" id="identityCheckMark">·</span><span class="check-label">退订、隐私政策和公司地址</span><span class="check-detail" id="identityCheckDetail">待填写</span></div>
+                    <div class="check-item"><span class="check-mark warn">!</span><span class="check-label">外链图片可能被邮箱隐藏</span><span class="check-detail">需试发</span></div>
+                    <div class="check-item"><span class="check-mark warn">!</span><span class="check-label">文案真实性和图片素材授权</span><span class="check-detail">业务确认</span></div>
+                  </div>
+                  <div class="field-grid">
+                    <div class="field full">
+                      <label for="companyAddress">公司地址</label>
+                      <input id="companyAddress" placeholder="发送前填写公司实际地址" required aria-describedby="companyAddressError">
+                      <div class="error" id="companyAddressError">请填写公司地址或平台变量。</div>
+                    </div>
+                    <div class="field"><label for="privacyUrl">隐私政策链接</label><input id="privacyUrl" type="url" placeholder="https://" required aria-describedby="privacyUrlError"><div class="error" id="privacyUrlError">请填写HTTPS链接或平台变量。</div></div>
+                    <div class="field"><label for="termsUrl">用户协议链接</label><input id="termsUrl" type="url" placeholder="https://" required aria-describedby="termsUrlError"><div class="error" id="termsUrlError">请填写HTTPS链接或平台变量。</div></div>
+                    <div class="field full"><label for="unsubscribeUrl">退订链接或平台变量</label><input id="unsubscribeUrl" placeholder="{{unsubscribe_url}}" required aria-describedby="unsubscribeUrlError"><div class="error" id="unsubscribeUrlError">请填写HTTPS链接、退订邮箱或平台变量。</div></div>
+                  </div>
+                  <div class="notice export-mode-notice" id="exportModeNotice" hidden>
+                    <strong>当前仍包含演示地址</strong>
+                    <span>可下载演示HTML用于内部体验。正式发送前，请替换示例图片和落地页地址。</span>
+                  </div>
+                  <div class="field">
+                    <label for="subjectOutput">发送平台邮件主题</label>
+                    <div class="input-row">
+                      <input id="subjectOutput" readonly>
+                      <button class="button secondary" id="copySubject" type="button">复制主题</button>
+                    </div>
+                    <div class="helper">主题需单独粘贴到发送平台，并保留开头的(AD)。</div>
+                  </div>
+                  <details class="source-details">
+                    <summary>查看HTML源码</summary>
+                    <div class="source-details-body">
+                      <div class="field">
+                        <label for="sourceOutput">已生成的HTML源码</label>
+                        <textarea class="source-output" id="sourceOutput" readonly spellcheck="false"></textarea>
+                        <div class="helper" id="sourceMeta">尚未生成</div>
+                      </div>
+                    </div>
+                  </details>
+                  <label class="choice">
+                    <input type="checkbox" id="riskConfirm">
+                    <span class="choice-card">
+                      <span class="choice-title">我已确认本次邮件内容与图片方式</span>
+                      <span class="choice-copy">包括活动真实性、素材授权、链接有效性和外链图片展示风险。</span>
+                    </span>
+                  </label>
+                  <div class="footer-actions">
+                    <button class="button ghost prev" type="button" data-prev="4">返回</button>
+                    <div class="footer-right">
+                      <button class="button secondary" id="copyHtml" type="button">复制HTML源码</button>
+                      <button class="button" id="downloadHtml" type="button">下载HTML</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <aside class="panel sticky-preview" aria-label="实时摘要与预览">
+              <div class="panel-head">
+                <h2 class="panel-title" id="previewTitle">本次任务</h2>
+                <p class="panel-copy" id="previewCopy">填写个人 API Key，或直接体验Demo。</p>
+              </div>
+              <div id="summaryPreview">
+                <div class="panel-body stack">
+                  <div class="summary-hero">
+                    <span class="summary-kicker" id="summaryStep">第1步，共6步</span>
+                    <strong class="summary-heading" id="summaryHeading">连接个人模型额度</strong>
+                    <div class="progress-track" id="progressTrack" role="progressbar" aria-label="邮件制作进度" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1"><div class="progress-fill" id="progressFill"></div></div>
+                  </div>
+                  <div class="summary-list">
+                    <div class="summary-row"><span>API Key</span><strong id="summaryToken">未连接</strong></div>
+                    <div class="summary-row"><span>素材状态</span><strong id="summaryAssets">等待上传</strong></div>
+                    <div class="summary-row"><span>图片地址</span><strong>HTTPS外链</strong></div>
+                    <div class="summary-row"><span>跳转链接</span><strong id="summaryLinks">等待配置</strong></div>
+                    <div class="summary-row"><span>检查状态</span><strong id="summaryChecks">尚未开始</strong></div>
+                  </div>
+                  <div class="summary-next"><span>下一步</span><strong id="summaryNext">整理图片素材</strong></div>
+                </div>
+              </div>
+              <div class="preview-stage" id="emailPreview" hidden>
+                <div class="preview-toolbar">
+                  <div class="preview-switch" role="group" aria-label="预览尺寸">
+                    <button class="active" type="button" aria-pressed="true" data-viewport="desktop">桌面端</button>
+                    <button type="button" aria-pressed="false" data-viewport="mobile">移动端</button>
+                  </div>
+                  <div class="preview-tools" role="group" aria-label="预览场景">
+                    <button class="preview-tool" id="previewImagesToggle" type="button" aria-pressed="false" title="检查图片被邮箱隐藏时的阅读效果">图片关闭</button>
+                    <button class="preview-tool" id="previewDarkToggle" type="button" aria-pressed="false" title="模拟部分邮箱客户端的暗色反转效果">暗色模拟</button>
+                  </div>
+                  <span class="preview-status" id="previewImageStatus" aria-live="polite">正在载入图片</span>
+                </div>
+                <div class="preview-window" id="previewWindow">
+                  <iframe id="emailFrame" title="营销邮件预览" scrolling="yes" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <section class="visual-studio" id="visualStudio" role="dialog" aria-modal="true" aria-labelledby="visualStudioTitle" hidden>
+    <header class="visual-studio-head">
+      <div>
+        <h2 class="visual-studio-title" id="visualStudioTitle">调整邮件视觉</h2>
+        <p class="visual-studio-subtitle">直接看效果。无需理解设计分类。</p>
+      </div>
+      <button class="button" id="closeVisualStudio" type="button">完成设计</button>
+    </header>
+    <div class="visual-studio-body">
+      <section class="visual-studio-commandbar">
+        <span class="visual-swatch brand" id="studioAutoSwatch" aria-hidden="true"><span></span><span></span></span>
+        <span class="auto-layout-copy"><strong id="autoLayoutTitle">已按当前内容排版</strong><span id="autoLayoutCopy">图片、文字和按钮均保持邮件客户端兼容结构。</span></span>
+        <span class="auto-layout-actions">
+          <button class="button secondary small" id="shuffleVisual" type="button">换一版</button>
+          <button class="button ghost small" id="resetAutoLayouts" type="button">恢复推荐</button>
+        </span>
+      </section>
+
+      <div class="visual-studio-lower">
+        <div class="visual-studio-controls">
+        <div class="notice warning" id="layoutOverrideNotice" hidden><strong id="layoutOverrideTitle">已保留手动调整</strong><span id="layoutOverrideCopy">换版只会调整仍处于自动编排的模块。</span></div>
+        <section class="panel panel-body visual-studio-section">
+          <div><h3>逐项调整</h3><p>只修改需要的模块。其他内容继续由系统安排。</p></div>
+          <div class="studio-module-list" id="studioModuleList"></div>
+        </section>
+
+        <section class="panel panel-body visual-studio-section">
+          <div><h3>调整品牌颜色</h3><p>系统会自动生成安全的浅色层级，并为按钮选择可读文字颜色。</p></div>
+          <div class="color-controls">
+            <label class="color-control" for="brandColor"><input id="brandColor" type="color" value="#176b61"><span><strong>品牌主色</strong><span>按钮、链接和视觉重点</span></span></label>
+            <label class="color-control" for="canvasColor"><input id="canvasColor" type="color" value="#eef1f0"><span><strong>邮件画布色</strong><span>邮件外围和整体氛围</span></span></label>
+          </div>
+        </section>
+
+        <div class="compatibility-note"><strong>兼容边界</strong><span>自动排版和手动调整都只使用表格与内联样式。发送前仍需向QQ、网易和新浪邮箱试发。</span></div>
+      </div>
+
+      <aside class="visual-studio-preview" aria-label="邮件视觉实时预览">
+        <div class="visual-studio-preview-head">
+          <strong id="studioPreviewTitle">当前邮件预览</strong>
+          <div class="studio-switch" role="group" aria-label="视觉预览尺寸">
+            <button class="active" id="studioDesktop" type="button" aria-pressed="true" data-studio-viewport="desktop">桌面端</button>
+            <button id="studioMobile" type="button" aria-pressed="false" data-studio-viewport="mobile">移动端</button>
+          </div>
+        </div>
+        <div class="visual-studio-frame" id="visualStudioFrame">
+          <iframe id="visualStudioIframe" title="邮件视觉预览" sandbox="allow-same-origin" referrerpolicy="no-referrer"></iframe>
+        </div>
+      </aside>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="confirm-overlay" id="newEmailDialog" hidden>
+    <section class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="newEmailTitle" aria-describedby="newEmailCopy">
+      <h2 id="newEmailTitle">新建一封邮件？</h2>
+      <p id="newEmailCopy">当前业务内容、素材、链接和导出信息会从本机草稿中清除。模型连接方式和界面主题会保留。</p>
+      <div class="confirm-actions">
+        <button class="button ghost" id="cancelNewEmail" type="button">取消</button>
+        <button class="button" id="confirmNewEmail" type="button">清空并新建</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const state = {
+      step: 0,
+      sidebarCollapsed: false,
+      sidebarPreferenceSet: false,
+      assetMode: 'poster',
+      tokenReady: false,
+      demoMode: false,
+      visualStyle: 'brand',
+      contentIntent: 'inspiration',
+      contentIntentSource: 'auto',
+      previewImagesOff: false,
+      previewDarkMode: false,
+      assets: [],
+      modules: createDefaultModules(),
+      moduleSeed: 5,
+      heroPreviewSrc: 'assets/demo/hero.jpg',
+      linksChecked: false,
+      linkReady: false,
+      generatedHtml: ''
+    };
+    let visualStudioReturnFocus = null;
+
+    function setSidebarCollapsed(collapsed, manual = false) {
+      state.sidebarCollapsed = Boolean(collapsed);
+      if (manual) state.sidebarPreferenceSet = true;
+      const layout = $('#appLayout');
+      const toggle = $('#sidebarToggle');
+      layout.classList.toggle('sidebar-collapsed', state.sidebarCollapsed);
+      toggle.setAttribute('aria-expanded', String(!state.sidebarCollapsed));
+      toggle.setAttribute('aria-label', state.sidebarCollapsed ? '展开制作流程' : '收起制作流程');
+      toggle.setAttribute('title', state.sidebarCollapsed ? '展开制作流程' : '收起制作流程');
+      toggle.textContent = state.sidebarCollapsed ? '›' : '‹';
+    }
+
+    function usesDesktopWorkspace() {
+      return Boolean(window.matchMedia && window.matchMedia('(min-width: 1121px)').matches);
+    }
+
+    const stepContent = [
+      ['连接模型', '填写个人 API Key，或直接体验Demo。'],
+      ['整理图片素材', '优先使用独立图片；只有长图时再提取正文和候选图片。'],
+      ['确认邮件内容', '编辑文案，并填写图片的公开HTTPS地址。'],
+      ['配置跳转链接', '统一管理图片、标题和按钮链接。'],
+      ['检查邮件效果', '切换屏幕与显示场景，确认阅读顺序和行动入口。'],
+      ['确认并导出', '补齐必要参数，随后复制或下载HTML源码。']
+    ];
+    const stepNames = ['连接模型', '整理素材', '确认内容', '配置链接', '检查预览', '导出邮件'];
+    const nextNames = ['整理图片素材', '确认邮件内容', '配置跳转链接', '检查邮件预览', '确认并导出', '完成本次邮件'];
+    const draftFieldIds = [
+      'apiEndpoint', 'modelSelect', 'subject', 'preheader', 'companyName', 'emailLabel', 'serviceLine',
+      'heroUrl', 'brandColor', 'canvasColor',
+      'campaignCode',
+      'companyAddress', 'privacyUrl', 'termsUrl', 'unsubscribeUrl'
+    ];
+    const draftKey = 'email-studio-draft-v3';
+    const themeKey = 'email-studio-theme';
+    const maxImageBytes = 15 * 1024 * 1024;
+    const maxAssetCount = 8;
+    const maxModuleCount = 6;
+    const visualStyleDefaults = {
+      safe: { brandColor: '#176b61', canvasColor: '#edf1f0' },
+      brand: { brandColor: '#155f55', canvasColor: '#eef1f0' },
+      expressive: { brandColor: '#1f5f8b', canvasColor: '#e9eff3' }
+    };
+    const visualVariantOrder = ['brand', 'safe', 'expressive'];
+    const visualVariantDescriptions = {
+      safe: '使用更紧凑的信息结构，方便快速扫读。',
+      brand: '突出一个重点内容，其余模块保持清晰节奏。',
+      expressive: '强化主视觉，但避免连续大图拉长邮件。'
+    };
+    const contentIntentDetails = {
+      inspiration: {
+        name: '以内容灵感为主',
+        copy: '采用故事首屏、重点大图和编辑式推荐。'
+      },
+      product: {
+        name: '以产品推荐为主',
+        copy: '采用双列产品卡和逐项跳转，移动端自动堆叠。'
+      },
+      promotion: {
+        name: '以优惠活动为主',
+        copy: '将活动信息和主行动放在阅读前部。'
+      }
+    };
+    const contentTemplateNames = {
+      inspiration: '灵感编辑版',
+      product: '产品精选版',
+      promotion: '活动聚焦版'
+    };
+
+    const sampleAssets = [
+      { name: 'demo-hero.jpg', meta: '1200 × 800 · 本地示例素材', src: 'assets/demo/hero.jpg' },
+      { name: 'demo-coast.jpg', meta: '840 × 504 · 本地示例素材', src: 'assets/demo/coast.jpg' },
+      { name: 'demo-trail.jpg', meta: '840 × 504 · 本地示例素材', src: 'assets/demo/trail.jpg' },
+      { name: 'demo-lake.jpg', meta: '840 × 504 · 本地示例素材', src: 'assets/demo/lake.jpg' },
+      { name: 'demo-sunset.jpg', meta: '840 × 504 · 本地示例素材', src: 'assets/demo/sunset.jpg' }
+    ];
+    const sampleImageUrls = {
+      heroUrl: 'https://assets.example.com/email-demo/hero.jpg'
+    };
+    const sampleFieldValues = {
+      subject: '(AD) 一份轻松出发的夏日灵感',
+      preheader: '去海边吹风，到山野散步，把周末留给喜欢的风景。',
+      companyName: '远屿旅行',
+      emailLabel: '轻旅行灵感',
+      serviceLine: '{{service_phone}}',
+      campaignCode: 'summer-inspiration'
+    };
+
+    function createBlankModule(id = 'm1') {
+      return {
+        id, title: '', cta: '', body: '', imageUrl: '', previewSrc: '', link: '', track: 'module_1',
+        lock: true, layout: 'auto', imageLink: '', titleLink: '', ctaLink: ''
+      };
+    }
+
+    function createDefaultModules() {
+      return [
+        {
+          id: 'm1', title: '沿着海岸慢慢走', cta: '查看海岸灵感',
+          body: '清晨看海，午后沿着小路散步。无需复杂计划，也能为周末留下一段轻松的记忆。',
+          imageUrl: 'https://assets.example.com/email-demo/coast.jpg',
+          previewSrc: 'assets/demo/coast.jpg',
+          link: 'https://example.com/demo/coast', track: 'coast', lock: true, layout: 'auto',
+          imageLink: '', titleLink: '', ctaLink: ''
+        },
+        {
+          id: 'm2', title: '把周末交给山野', cta: '收下散步路线',
+          body: '选一条不赶时间的轻徒步路线，在树影和风声里重新找到自己的节奏。',
+          imageUrl: 'https://assets.example.com/email-demo/trail.jpg',
+          previewSrc: 'assets/demo/trail.jpg',
+          link: 'https://example.com/demo/trail', track: 'trail', lock: true, layout: 'auto',
+          imageLink: '', titleLink: '', ctaLink: ''
+        },
+        {
+          id: 'm3', title: '在湖边停一会', cta: '查看湖畔路线',
+          body: '沿着湖边慢慢散步，在傍晚前留出一段安静时间。',
+          imageUrl: 'https://assets.example.com/email-demo/lake.jpg',
+          previewSrc: 'assets/demo/lake.jpg',
+          link: 'https://example.com/demo/lake', track: 'lake', lock: true, layout: 'auto',
+          imageLink: '', titleLink: '', ctaLink: ''
+        },
+        {
+          id: 'm4', title: '去看一场日落', cta: '查看日落灵感',
+          body: '选一处视野开阔的地方，把傍晚留给风和落日。',
+          imageUrl: 'https://assets.example.com/email-demo/sunset.jpg',
+          previewSrc: 'assets/demo/sunset.jpg',
+          link: 'https://example.com/demo/sunset', track: 'sunset', lock: true, layout: 'auto',
+          imageLink: '', titleLink: '', ctaLink: ''
+        }
+      ];
+    }
+
+    const $ = (selector, scope = document) => scope.querySelector(selector);
+    const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
+
+    function escapeHtml(value) {
+      const chars = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return String(value).replace(/[&<>"']/g, (char) => chars[char]);
+    }
+
+    function fieldValue(id, fallback = '') {
+      const element = document.getElementById(id);
+      const value = element ? element.value.trim() : '';
+      return value || fallback;
+    }
+
+    function isPreviewAssetSource(value) {
+      return /^https:\/\//i.test(value || '') || /^assets\/demo\/[a-z0-9-]+\.jpg$/i.test(value || '');
+    }
+
+    function emailText(value) {
+      return escapeHtml(value).replace(/\r?\n/g, '<br>');
+    }
+
+    function emailUrl(value, fallback = '#') {
+      const raw = String(value || '').trim();
+      if (/^(https?:\/\/|mailto:|tel:|\{\{)/i.test(raw)) return escapeHtml(raw);
+      return escapeHtml(fallback);
+    }
+
+    function emailImageUrl(value, previewOnly = false) {
+      if (previewOnly && isPreviewAssetSource(value)) return escapeHtml(value);
+      return emailUrl(value);
+    }
+
+    function normalizeHexColor(value, fallback) {
+      const color = String(value || '').trim();
+      return /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : fallback;
+    }
+
+    function mixHex(base, blend, blendWeight) {
+      const read = (color) => [1, 3, 5].map((index) => parseInt(color.slice(index, index + 2), 16));
+      const a = read(base);
+      const b = read(blend);
+      const channels = a.map((value, index) => Math.round(value * (1 - blendWeight) + b[index] * blendWeight));
+      return `#${channels.map((value) => value.toString(16).padStart(2, '0')).join('')}`;
+    }
+
+    function readableText(background) {
+      const [r, g, b] = [1, 3, 5].map((index) => parseInt(background.slice(index, index + 2), 16));
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return luminance > 0.58 ? '#10243c' : '#ffffff';
+    }
+
+    function emailTheme() {
+      const style = visualVariantOrder.includes(state.visualStyle) ? state.visualStyle : recommendedVisualStyle();
+      const defaults = visualStyleDefaults[style];
+      const accent = normalizeHexColor(fieldValue('brandColor'), defaults.brandColor);
+      const canvas = normalizeHexColor(fieldValue('canvasColor'), defaults.canvasColor);
+      const text = '#10243c';
+      const muted = '#586b73';
+      const accentText = readableText(accent);
+      const accentMuted = accentText === '#ffffff'
+        ? mixHex(accent, '#ffffff', 0.72)
+        : mixHex(accent, text, 0.62);
+      if (style === 'expressive') {
+        return {
+          style, accent, canvas, text, muted,
+          headerBg: accent, headerText: accentText, headerLabel: accentMuted,
+          introBg: accent, introText: accentText, introMuted: accentMuted,
+          card: '#ffffff', cardAlt: mixHex(canvas, '#ffffff', 0.72),
+          cardBorder: mixHex(accent, '#ffffff', 0.74),
+          buttonBg: accent, buttonText: accentText, footerBg: mixHex(canvas, '#ffffff', 0.48),
+          headerRule: accentMuted, introPadding: '34px 38px 30px',
+          heroPadding: '0 18px 0', heroRadius: '8px', buttonRadius: '6px'
+        };
+      }
+      if (style === 'brand') {
+        return {
+          style, accent, canvas, text, muted,
+          headerBg: '#ffffff', headerText: text, headerLabel: accent,
+          introBg: mixHex(accent, '#ffffff', 0.92), introText: text, introMuted: muted,
+          card: '#ffffff', cardAlt: mixHex(canvas, '#ffffff', 0.54),
+          cardBorder: mixHex(accent, '#ffffff', 0.78),
+          buttonBg: accent, buttonText: accentText, footerBg: mixHex(canvas, '#ffffff', 0.48),
+          headerRule: accent, introPadding: '36px 38px 30px',
+          heroPadding: '0 28px 0', heroRadius: '8px', buttonRadius: '6px'
+        };
+      }
+      return {
+        style, accent, canvas, text, muted,
+        headerBg: '#ffffff', headerText: text, headerLabel: accent,
+        introBg: '#ffffff', introText: text, introMuted: muted,
+        card: '#ffffff', cardAlt: '#f3f5f4', cardBorder: '#d9dfdd',
+        buttonBg: accent, buttonText: accentText, footerBg: '#f3f5f4',
+        headerRule: accent, introPadding: '32px 38px 28px',
+        heroPadding: '0', heroRadius: '0', buttonRadius: '6px'
+      };
+    }
+
+    function setVisualStyle(style) {
+      const next = visualVariantOrder.includes(style) ? style : recommendedVisualStyle();
+      state.visualStyle = next;
+      state.generatedHtml = '';
+      invalidateExportConfirmation();
+      scheduleDraftSave();
+      schedulePreviewRefresh();
+      updateVisualSummary();
+      updateLayoutOverrideNotice();
+      renderVisualStudioPreview();
+    }
+
+    function recommendedVisualStyle() {
+      if (state.contentIntent === 'product') return state.modules.length >= 3 ? 'safe' : 'brand';
+      if (state.contentIntent === 'promotion') return state.modules.length <= 3 ? 'expressive' : 'brand';
+      if (state.modules.length <= 2) return 'expressive';
+      if (state.modules.length >= 5) return 'safe';
+      return 'brand';
+    }
+
+    function inferContentIntent() {
+      const text = [
+        fieldValue('subject'), fieldValue('preheader'), fieldValue('emailLabel'),
+        ...state.modules.flatMap((module) => [module.title, module.body, module.cta])
+      ].join(' ');
+      const countMatches = (pattern) => (text.match(pattern) || []).length;
+      const promotionScore = countMatches(/优惠券|领券|满减|立减|返现|补贴|权益/g) * 3
+        + countMatches(/[1-9](?:\.\d+)?折|大促|抢购|领取/g) * 2
+        + countMatches(/优惠|折扣|促销|限时/g);
+      const productScore = countMatches(/酒店|航班|机票|线路|房型|门票|套餐|产品/g) * 2
+        + countMatches(/价格|起价|\d+(?:\.\d+)?元起|人民币|￥|¥/g);
+      if (productScore > 0 && productScore >= promotionScore) return 'product';
+      if (promotionScore > 0) return 'promotion';
+      return 'inspiration';
+    }
+
+    function updateContentIntentSummary() {
+      const detail = contentIntentDetails[state.contentIntent] || contentIntentDetails.inspiration;
+      if ($('#contentIntentName')) $('#contentIntentName').textContent = detail.name;
+      if ($('#contentIntentCopy')) $('#contentIntentCopy').textContent = detail.copy;
+      $$('input[name="contentIntent"]').forEach((input) => { input.checked = input.value === state.contentIntent; });
+    }
+
+    function setContentIntent(intent, manual = true) {
+      if (!contentIntentDetails[intent]) return;
+      state.contentIntent = intent;
+      state.contentIntentSource = manual ? 'manual' : 'auto';
+      if (state.modules.every((module) => module.layout === 'auto')) state.visualStyle = recommendedVisualStyle();
+      state.generatedHtml = '';
+      state.linksChecked = false;
+      state.linkReady = false;
+      invalidateExportConfirmation();
+      updateContentIntentSummary();
+      updateVisualSummary();
+      renderVisualStudioPreview();
+      schedulePreviewRefresh();
+      scheduleDraftSave();
+      if (manual) toast('已按你的理解调整自动排版');
+    }
+
+    function refreshInferredContentIntent() {
+      if (state.contentIntentSource !== 'auto') return;
+      const inferred = inferContentIntent();
+      if (inferred !== state.contentIntent) setContentIntent(inferred, false);
+      else updateContentIntentSummary();
+    }
+
+    function shuffleVisualStyle() {
+      const currentIndex = Math.max(0, visualVariantOrder.indexOf(state.visualStyle));
+      setVisualStyle(visualVariantOrder[(currentIndex + 1) % visualVariantOrder.length]);
+      toast('已生成另一版排版');
+    }
+
+    function updateVisualSummary() {
+      const style = visualVariantOrder.includes(state.visualStyle) ? state.visualStyle : recommendedVisualStyle();
+      const customCount = state.modules.filter((module) => module.layout !== 'auto').length;
+      const templateName = contentTemplateNames[state.contentIntent] || contentTemplateNames.inspiration;
+      const swatch = $('#visualSummarySwatch');
+      if (swatch) swatch.className = `visual-swatch ${style}`;
+      const studioSwatch = $('#studioAutoSwatch');
+      if (studioSwatch) studioSwatch.className = `visual-swatch ${style}`;
+      const swatchImage = String(state.heroPreviewSrc || fieldValue('heroUrl') || '').replace(/"/g, '%22');
+      [swatch, studioSwatch].forEach((element) => {
+        const media = element ? element.querySelector('span:first-child') : null;
+        if (media) media.style.backgroundImage = swatchImage ? `url("${swatchImage}")` : '';
+      });
+      if ($('#currentVisualName')) $('#currentVisualName').textContent = customCount ? '已按需调整' : '已自动生成';
+      if ($('#currentVisualCopy')) $('#currentVisualCopy').textContent = customCount
+        ? `${customCount}个模块已手动调整，其余内容继续自动编排。`
+        : `${templateName}已根据${state.modules.length}个模块安排阅读顺序。`;
+      if ($('#autoLayoutTitle')) $('#autoLayoutTitle').textContent = style === recommendedVisualStyle() ? `${templateName} · 系统推荐` : `${templateName} · 另一版`;
+      if ($('#autoLayoutCopy')) $('#autoLayoutCopy').textContent = visualVariantDescriptions[style];
+      if ($('#studioPreviewTitle')) $('#studioPreviewTitle').textContent = '当前邮件预览';
+    }
+
+    function updateLayoutOverrideNotice() {
+      const notice = $('#layoutOverrideNotice');
+      if (!notice) return;
+      const customCount = state.modules.filter((module) => module.layout !== 'auto').length;
+      notice.hidden = customCount === 0;
+      if (customCount) $('#layoutOverrideCopy').textContent = `${customCount}个模块使用手动排版。换一版时会保留这些设置。`;
+      updateVisualSummary();
+    }
+
+    function resetAutoLayouts() {
+      state.modules.forEach((module) => { module.layout = 'auto'; });
+      state.visualStyle = recommendedVisualStyle();
+      state.generatedHtml = '';
+      renderContentModules();
+      updateLayoutOverrideNotice();
+      renderVisualStudioPreview();
+      invalidateExportConfirmation();
+      scheduleDraftSave();
+      toast('已按当前内容重新推荐排版');
+    }
+
+    function visualPreviewHtml() {
+      const html = buildEmailHtml({ previewOnly: true });
+      if (!html) return '';
+      const pageHref = window.location && window.location.href ? window.location.href : '';
+      const previewBase = pageHref ? new URL('.', pageHref).href : '';
+      return previewBase ? html.replace('<head>', `<head>\n  <base href="${escapeHtml(previewBase)}">`) : html;
+    }
+
+    function renderVisualStudioPreview() {
+      const studio = $('#visualStudio');
+      const frame = $('#visualStudioIframe');
+      if (!studio || studio.hidden || !frame) return;
+      frame.srcdoc = visualPreviewHtml();
+    }
+
+    function openVisualStudio(event) {
+      visualStudioReturnFocus = event?.currentTarget || $('#openVisualStudio');
+      $('#visualStudio').hidden = false;
+      document.body.style.overflow = 'hidden';
+      const useMobilePreview = window.matchMedia && window.matchMedia('(max-width: 760px)').matches;
+      [$('#studioDesktop'), $('#studioMobile')].forEach((button) => {
+        const active = useMobilePreview ? button === $('#studioMobile') : button === $('#studioDesktop');
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', String(active));
+      });
+      $('#visualStudioFrame').classList.toggle('mobile', useMobilePreview);
+      updateVisualSummary();
+      updateLayoutOverrideNotice();
+      renderStudioModules();
+      renderVisualStudioPreview();
+      $('#closeVisualStudio').focus();
+    }
+
+    function closeVisualStudio() {
+      $('#visualStudio').hidden = true;
+      document.body.style.overflow = '';
+      if (visualStudioReturnFocus) visualStudioReturnFocus.focus();
+    }
+
+    function moduleById(id) {
+      return state.modules.find((module) => module.id === id);
+    }
+
+    function renderStudioModules() {
+      const list = $('#studioModuleList');
+      if (!list) return;
+      list.innerHTML = state.modules.map((module, index) => {
+        const preview = module.previewSrc || module.imageUrl || 'assets/demo/coast.jpg';
+        return `
+          <div class="studio-module-row" data-module-id="${escapeHtml(module.id)}">
+            <img class="studio-module-thumb" src="${escapeHtml(preview)}" alt="${escapeHtml(module.title || `内容模块${index + 1}`)}预览">
+            <div class="studio-module-main">
+              <div class="studio-module-title">${index + 1}. ${escapeHtml(module.title || '未命名模块')}</div>
+              <div class="studio-module-tools">
+                <select data-studio-layout aria-label="${escapeHtml(module.title || `内容模块${index + 1}`)}排版">
+                  <option value="auto"${module.layout === 'auto' ? ' selected' : ''}>由系统安排</option>
+                  <option value="featured"${module.layout === 'featured' ? ' selected' : ''}>重点大图</option>
+                  <option value="image-left"${module.layout === 'image-left' ? ' selected' : ''}>左图右文</option>
+                  <option value="image-right"${module.layout === 'image-right' ? ' selected' : ''}>右图左文</option>
+                </select>
+                <span class="studio-module-order">
+                  <button class="button ghost small" type="button" data-module-action="up" data-module-id="${escapeHtml(module.id)}"${index === 0 ? ' disabled' : ''}>上移</button>
+                  <button class="button ghost small" type="button" data-module-action="down" data-module-id="${escapeHtml(module.id)}"${index === state.modules.length - 1 ? ' disabled' : ''}>下移</button>
+                </span>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function renderContentModules() {
+      const list = $('#contentModuleList');
+      list.innerHTML = state.modules.map((module, index) => {
+        const prefix = `module-${module.id}`;
+        const preview = module.previewSrc || module.imageUrl || 'assets/demo/coast.jpg';
+        return `
+          <details class="module-item module-editor" data-module-id="${escapeHtml(module.id)}"${index === 0 || !module.title ? ' open' : ''}>
+            <summary class="module-editor-summary">
+              <img class="module-summary-thumb" src="${escapeHtml(preview)}" alt="">
+              <span class="module-summary-copy"><span>内容模块 ${index + 1}</span><strong id="${prefix}-summary-title">${escapeHtml(module.title || '待填写标题')}</strong></span>
+            </summary>
+            <div class="module-editor-body">
+              <img class="module-thumb" src="${escapeHtml(preview)}" alt="${escapeHtml(module.title || `内容模块${index + 1}`)}预览">
+              <div class="module-content">
+              <div class="module-toolbar">
+                <span class="module-order">内容模块 ${index + 1}</span>
+                <div class="module-controls">
+                  <label class="layout-control"><span>排版</span><select data-module-field="layout" aria-label="内容模块 ${index + 1} 排版">
+                    <option value="auto"${module.layout === 'auto' ? ' selected' : ''}>自动编排</option>
+                    <option value="featured"${module.layout === 'featured' ? ' selected' : ''}>重点大图</option>
+                    <option value="image-left"${module.layout === 'image-left' ? ' selected' : ''}>左图右文</option>
+                    <option value="image-right"${module.layout === 'image-right' ? ' selected' : ''}>右图左文</option>
+                  </select></label>
+                  <div class="module-actions">
+                    <button class="button ghost small" type="button" data-module-action="up" data-module-id="${escapeHtml(module.id)}"${index === 0 ? ' disabled' : ''}>上移</button>
+                    <button class="button ghost small" type="button" data-module-action="down" data-module-id="${escapeHtml(module.id)}"${index === state.modules.length - 1 ? ' disabled' : ''}>下移</button>
+                    <button class="button ghost small" type="button" data-module-action="remove" data-module-id="${escapeHtml(module.id)}"${state.modules.length === 1 ? ' disabled' : ''}>删除</button>
+                  </div>
+                </div>
+              </div>
+              <div class="field-grid">
+                <div class="field"><label for="${prefix}-title">标题</label><input id="${prefix}-title" data-module-field="title" value="${escapeHtml(module.title)}" required aria-describedby="${prefix}-title-error"><div class="error" id="${prefix}-title-error">请填写标题。</div></div>
+                <div class="field"><label for="${prefix}-cta">按钮文字</label><input id="${prefix}-cta" data-module-field="cta" value="${escapeHtml(module.cta)}" required aria-describedby="${prefix}-cta-error"><div class="error" id="${prefix}-cta-error">请填写按钮文字。</div></div>
+                <div class="field full"><label for="${prefix}-body">正文</label><textarea id="${prefix}-body" data-module-field="body" required aria-describedby="${prefix}-body-error">${escapeHtml(module.body)}</textarea><div class="error" id="${prefix}-body-error">请填写正文。</div></div>
+                <div class="field full"><label for="${prefix}-image">公开HTTPS图片地址</label><input id="${prefix}-image" data-module-field="imageUrl" type="url" value="${escapeHtml(module.imageUrl)}" required aria-describedby="${prefix}-image-error"><div class="error" id="${prefix}-image-error">请填写公开可访问的HTTPS图片地址。</div></div>
+              </div>
+              </div>
+            </div>
+          </details>`;
+      }).join('');
+      $('#moduleCountStatus').textContent = `${state.modules.length}个模块`;
+      updateModuleMetrics();
+      renderStudioModules();
+      updateVisualSummary();
+    }
+
+    function renderLinkModules() {
+      $('#linkModuleList').innerHTML = state.modules.map((module, index) => {
+        const prefix = `link-${module.id}`;
+        const preview = module.previewSrc || module.imageUrl || 'assets/demo/coast.jpg';
+        return `
+          <div class="link-card" data-module-id="${escapeHtml(module.id)}">
+            <img class="link-visual" src="${escapeHtml(preview)}" alt="${escapeHtml(module.title || `内容模块${index + 1}`)}预览">
+            <div>
+              <div class="link-card-head"><span class="link-card-title">内容模块 ${index + 1}：${escapeHtml(module.title || '未命名')}</span><span class="link-status" id="${prefix}-status">待检查</span></div>
+              <div class="field"><label for="${prefix}-base">落地页地址</label><input id="${prefix}-base" data-link-field="link" type="url" value="${escapeHtml(module.link)}"></div>
+              <details class="advanced-settings" style="margin-top:12px;">
+                <summary>单独链接与追踪设置</summary>
+                <div class="advanced-settings-body">
+                  <div class="field"><label for="${prefix}-track">模块追踪标识</label><input id="${prefix}-track" data-link-field="track" value="${escapeHtml(module.track)}" spellcheck="false"><div class="helper">系统已自动生成，通常无需修改。</div></div>
+                  <label class="link-options"><input id="${prefix}-lock" data-link-field="lock" type="checkbox"${module.lock ? ' checked' : ''}>图片、标题和按钮使用同一个链接</label>
+                  <div class="advanced-links" id="${prefix}-advanced"${module.lock ? ' hidden' : ''}>
+                    <div class="field-grid single">
+                      <div class="field"><label for="${prefix}-image-link">图片链接</label><input id="${prefix}-image-link" data-link-field="imageLink" type="url" value="${escapeHtml(module.imageLink)}" placeholder="留空则使用落地页地址"></div>
+                      <div class="field"><label for="${prefix}-title-link">标题链接</label><input id="${prefix}-title-link" data-link-field="titleLink" type="url" value="${escapeHtml(module.titleLink)}" placeholder="留空则使用落地页地址"></div>
+                      <div class="field"><label for="${prefix}-cta-link">按钮链接</label><input id="${prefix}-cta-link" data-link-field="ctaLink" type="url" value="${escapeHtml(module.ctaLink)}" placeholder="留空则使用落地页地址"></div>
+                    </div>
+                  </div>
+                </div>
+              </details>
+              <div class="final-url" id="${prefix}-final">等待生成最终链接</div>
+            </div>
+          </div>`;
+      }).join('');
+      if (state.linksChecked) validateAllLinks(false, false);
+    }
+
+    function updateModuleMetrics() {
+      const imageCount = state.modules.length + 1;
+      $('#metricImageCount').textContent = `${imageCount}张`;
+      $('#metricModuleCount').textContent = `${state.modules.length}段`;
+      $('#altTextCount').textContent = `${imageCount}/${imageCount}`;
+    }
+
+    function addModule() {
+      if (state.modules.length >= maxModuleCount) {
+        toast(`一封邮件最多${maxModuleCount}个内容模块`);
+        return;
+      }
+      const number = state.moduleSeed++;
+      state.modules.push({
+        id: `m${number}`, title: '', cta: '', body: '', imageUrl: '', previewSrc: '',
+        link: '', track: `module_${number}`, lock: true, layout: 'auto', imageLink: '', titleLink: '', ctaLink: ''
+      });
+      state.generatedHtml = '';
+      state.linksChecked = false;
+      state.linkReady = false;
+      invalidateExportConfirmation();
+      if (state.contentIntentSource === 'auto') {
+        refreshInferredContentIntent();
+        if (state.modules.every((module) => module.layout === 'auto')) state.visualStyle = recommendedVisualStyle();
+      }
+      renderContentModules();
+      renderLinkModules();
+      renderVisualStudioPreview();
+      scheduleDraftSave();
+      toast('已添加内容模块');
+    }
+
+    function moveModule(id, offset) {
+      const index = state.modules.findIndex((module) => module.id === id);
+      const target = index + offset;
+      if (index < 0 || target < 0 || target >= state.modules.length) return;
+      const [module] = state.modules.splice(index, 1);
+      state.modules.splice(target, 0, module);
+      state.generatedHtml = '';
+      state.linksChecked = false;
+      state.linkReady = false;
+      invalidateExportConfirmation();
+      renderContentModules();
+      renderLinkModules();
+      renderVisualStudioPreview();
+      scheduleDraftSave();
+    }
+
+    function removeModule(id) {
+      if (state.modules.length === 1) {
+        toast('至少保留一个内容模块');
+        return;
+      }
+      state.modules = state.modules.filter((module) => module.id !== id);
+      state.generatedHtml = '';
+      state.linksChecked = false;
+      state.linkReady = false;
+      invalidateExportConfirmation();
+      if (state.contentIntentSource === 'auto') {
+        refreshInferredContentIntent();
+        if (state.modules.every((module) => module.layout === 'auto')) state.visualStyle = recommendedVisualStyle();
+      }
+      renderContentModules();
+      renderLinkModules();
+      renderVisualStudioPreview();
+      scheduleDraftSave();
+      toast('内容模块已删除');
+    }
+
+    function composeTrackedUrl(value, code, campaign) {
+      try {
+        const url = new URL(value);
+        if (url.protocol !== 'https:') return '';
+        url.searchParams.set('utm_source', 'email');
+        url.searchParams.set('utm_medium', 'marketing');
+        url.searchParams.set('utm_campaign', campaign);
+        url.searchParams.set('utm_content', code);
+        return url.toString();
+      } catch (error) {
+        return '';
+      }
+    }
+
+    function inspectLink(value) {
+      const result = { errors: [], warnings: [] };
+      let url;
+      try { url = new URL(value); } catch (error) {
+        result.errors.push('地址格式不完整');
+        return result;
+      }
+      if (url.protocol !== 'https:') result.errors.push('必须使用HTTPS');
+      const host = url.hostname.toLowerCase();
+      const shortHosts = ['bit.ly', 't.cn', 'dwz.cn', 'tinyurl.com', 'url.cn'];
+      if (shortHosts.some((item) => host === item || host.endsWith(`.${item}`))) result.errors.push('不使用短链');
+      if (url.username || url.password) result.errors.push('链接中不能包含账号或密码');
+      const privateHost = host === 'localhost' || host === '0.0.0.0' || host === '[::1]' || host.endsWith('.local') || host.endsWith('.internal')
+        || /^(10\.|127\.|169\.254\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.)/.test(host);
+      if (privateHost) result.errors.push('不能使用内部测试地址');
+      if (host === 'example.com' || host.endsWith('.example.com')) result.warnings.push('当前为Demo占位域名');
+      const sensitive = ['email', 'phone', 'mobile', 'token', 'api_key', 'access_token', 'userid', 'user_id'];
+      const found = Array.from(url.searchParams.keys()).filter((key) => sensitive.includes(key.toLowerCase()));
+      if (found.length) result.warnings.push(`疑似敏感参数：${found.join('、')}`);
+      return result;
+    }
+
+    function getLinkConfig(module) {
+      const base = String(module.link || '').trim();
+      const code = String(module.track || '').trim() || module.id;
+      const campaign = fieldValue('campaignCode', 'campaign');
+      const locked = module.lock;
+      const raw = locked ? { image: base, title: base, cta: base } : {
+        image: String(module.imageLink || '').trim() || base,
+        title: String(module.titleLink || '').trim() || base,
+        cta: String(module.ctaLink || '').trim() || base
+      };
+      return {
+        base,
+        code,
+        locked,
+        raw,
+        imageLink: composeTrackedUrl(raw.image, locked ? code : `${code}_image`, campaign),
+        titleLink: composeTrackedUrl(raw.title, locked ? code : `${code}_title`, campaign),
+        ctaLink: composeTrackedUrl(raw.cta, locked ? code : `${code}_cta`, campaign)
+      };
+    }
+
+    function resetLinkCheckState() {
+      state.linksChecked = false;
+      state.linkReady = false;
+      $$('.link-status').forEach((status) => { status.className = 'link-status'; status.textContent = '待检查'; });
+      $$('.final-url').forEach((final) => { final.textContent = '等待检查后生成'; });
+      $('#linkHttpsMark').className = 'check-mark pending';
+      $('#linkHttpsMark').textContent = '·';
+      $('#linkHttpsDetail').textContent = '尚未检查';
+      $('#linkRiskDetail').textContent = '尚未检查';
+      $('#linkRiskReasons').hidden = true;
+      updateSummary();
+    }
+
+    function validateAllLinks(showMessage = false, markChecked = true) {
+      let hardErrors = 0;
+      let warnings = 0;
+      const riskReasons = [];
+      const campaign = fieldValue('campaignCode');
+      const campaignValid = /^[a-z0-9_-]+$/i.test(campaign);
+      $('#campaignCodeError').classList.toggle('show', !campaignValid);
+      $('#campaignCode').setAttribute('aria-invalid', String(!campaignValid));
+      if (!campaignValid) hardErrors += 1;
+      const configs = state.modules.map((module, index) => {
+        const config = getLinkConfig(module);
+        const inspected = [...new Set(Object.values(config.raw))].map(inspectLink);
+        if (!/^[a-z0-9_-]+$/i.test(config.code)) inspected[0].errors.push('追踪标识格式不正确');
+        const errors = inspected.flatMap((item) => item.errors);
+        const notes = inspected.flatMap((item) => item.warnings);
+        hardErrors += errors.length;
+        warnings += notes.length;
+        errors.forEach((reason) => riskReasons.push(`模块${index + 1}：${reason}`));
+        notes.forEach((reason) => riskReasons.push(`模块${index + 1}：${reason}`));
+        const status = $(`#link-${module.id}-status`);
+        const final = $(`#link-${module.id}-final`);
+        if (status) {
+          status.className = `link-status ${errors.length ? 'error' : (notes.length ? 'warn' : 'ok')}`;
+          status.textContent = errors.length ? errors[0] : (notes.length ? notes[0] : '格式通过');
+        }
+        if (final) final.textContent = config.ctaLink || '无法生成最终链接';
+        return config;
+      });
+      const bases = configs.map((config) => config.base).filter(Boolean);
+      if (new Set(bases).size < bases.length) {
+        warnings += 1;
+        riskReasons.push('多个内容模块使用了同一个落地页，请确认是否符合预期');
+      }
+      $('#linkHttpsMark').className = `check-mark${hardErrors ? ' warn' : ''}`;
+      $('#linkHttpsMark').textContent = hardErrors ? '!' : '✓';
+      $('#linkHttpsDetail').textContent = hardErrors ? `${hardErrors}项需修改` : '格式通过';
+      $('#linkRiskDetail').textContent = warnings ? `${warnings}项提醒` : '未发现明显风险';
+      $('#linkRiskReasons').hidden = riskReasons.length === 0;
+      $('#linkRiskReasons').textContent = riskReasons.join('；');
+      if (markChecked) state.linksChecked = true;
+      state.linkReady = hardErrors === 0;
+      if (showMessage) toast(hardErrors ? '请先修改链接检查中的错误' : (warnings ? '链接格式通过，请留意风险提醒' : '链接格式检查通过'));
+      updateSummary();
+      return state.linkReady;
+    }
+
+    function moduleData(module) {
+      const links = getLinkConfig(module);
+      return {
+        title: String(module.title || '').trim(),
+        body: String(module.body || '').trim(),
+        cta: String(module.cta || '').trim() || '查看活动',
+        layout: ['auto', 'featured', 'image-left', 'image-right'].includes(module.layout) ? module.layout : 'auto',
+        imageUrl: String(module.imageUrl || '').trim(),
+        previewSrc: isPreviewAssetSource(module.previewSrc) ? module.previewSrc : '',
+        imageLink: links.imageLink,
+        titleLink: links.titleLink,
+        ctaLink: links.ctaLink
+      };
+    }
+
+    function validateContent(showMessage = false) {
+      const subject = fieldValue('subject');
+      const subjectValid = /^\(AD\)\s*\S+/i.test(subject);
+      $('#subjectError').classList.toggle('show', !subjectValid);
+      $('#subject').setAttribute('aria-invalid', String(!subjectValid));
+      const companyValid = Boolean(fieldValue('companyName'));
+      $('#companyNameError').classList.toggle('show', !companyValid);
+      $('#companyName').setAttribute('aria-invalid', String(!companyValid));
+      let modulesValid = state.modules.length > 0;
+      state.modules.forEach((module) => {
+        ['title', 'cta', 'body'].forEach((field) => {
+          const valid = Boolean(String(module[field] || '').trim());
+          modulesValid = modulesValid && valid;
+          const input = $(`#module-${module.id}-${field}`);
+          const error = $(`#module-${module.id}-${field}-error`);
+          if (input) input.setAttribute('aria-invalid', String(!valid));
+          if (error) error.classList.toggle('show', !valid);
+        });
+      });
+      if (showMessage && !subjectValid) toast('营销邮件主题必须以(AD)开头');
+      else if (showMessage && (!companyValid || !modulesValid)) toast('请补齐发送主体和内容模块');
+      return subjectValid && companyValid && modulesValid;
+    }
+
+    function isSafeHttpsImageUrl(value) {
+      const shortHosts = ['bit.ly', 't.cn', 'dwz.cn', 'tinyurl.com', 'url.cn'];
+      try {
+        const url = new URL(value);
+        const host = url.hostname.toLowerCase();
+        const privateHost = host === 'localhost' || host === '0.0.0.0' || host === '[::1]' || host.endsWith('.local') || host.endsWith('.internal')
+          || /^(10\.|127\.|169\.254\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(host);
+        return url.protocol === 'https:' && !url.username && !url.password && !privateHost
+          && !shortHosts.some((item) => host === item || host.endsWith(`.${item}`));
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function validateImageUrls(showMessage = false) {
+      const heroValid = isSafeHttpsImageUrl(fieldValue('heroUrl'));
+      $('#heroUrlError').classList.toggle('show', !heroValid);
+      $('#heroUrl').setAttribute('aria-invalid', String(!heroValid));
+      let modulesValid = true;
+      state.modules.forEach((module) => {
+        const passed = isSafeHttpsImageUrl(String(module.imageUrl || '').trim());
+        modulesValid = modulesValid && passed;
+        const input = $(`#module-${module.id}-image`);
+        const error = $(`#module-${module.id}-image-error`);
+        if (input) input.setAttribute('aria-invalid', String(!passed));
+        if (error) error.classList.toggle('show', !passed);
+      });
+      const passed = heroValid && modulesValid;
+      if (!passed && showMessage) toast('请补齐头图和每个内容模块的HTTPS图片地址');
+      return passed;
+    }
+
+    function validateExportFields(showMessage = false) {
+      const isVariable = (value) => /^\{\{[^{}]+\}\}$/.test(value);
+      const isHttps = (value) => /^https:\/\//i.test(value);
+      const values = {
+        companyAddress: fieldValue('companyAddress'),
+        privacyUrl: fieldValue('privacyUrl'),
+        termsUrl: fieldValue('termsUrl'),
+        unsubscribeUrl: fieldValue('unsubscribeUrl')
+      };
+      const valid = {
+        companyAddress: Boolean(values.companyAddress),
+        privacyUrl: isHttps(values.privacyUrl) || isVariable(values.privacyUrl),
+        termsUrl: isHttps(values.termsUrl) || isVariable(values.termsUrl),
+        unsubscribeUrl: isHttps(values.unsubscribeUrl) || /^mailto:/i.test(values.unsubscribeUrl) || isVariable(values.unsubscribeUrl)
+      };
+      Object.entries(valid).forEach(([id, passed]) => {
+        $(`#${id}Error`).classList.toggle('show', !passed);
+        $(`#${id}`).setAttribute('aria-invalid', String(!passed));
+      });
+      const passed = Object.values(valid).every(Boolean);
+      const completedCount = Object.values(valid).filter(Boolean).length;
+      $('#identityCheckMark').className = `check-mark${passed ? '' : ' pending'}`;
+      $('#identityCheckMark').textContent = passed ? '✓' : '·';
+      $('#identityCheckDetail').textContent = passed ? '已完成' : `待填写 ${4 - completedCount}项`;
+      if (!passed && showMessage) {
+        const firstInvalidId = Object.keys(valid).find((id) => !valid[id]);
+        const firstInvalid = firstInvalidId ? document.getElementById(firstInvalidId) : null;
+        if (firstInvalid) {
+          firstInvalid.focus();
+          if (typeof firstInvalid.scrollIntoView === 'function') firstInvalid.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }
+        toast(`还有${4 - completedCount}项导出信息待填写`);
+      }
+      return passed;
+    }
+
+    function demoDataReasons() {
+      const imageUrls = [fieldValue('heroUrl'), ...state.modules.map((module) => module.imageUrl)];
+      const landingUrls = state.modules.flatMap((module) => Object.values(getLinkConfig(module).raw));
+      const sampleImage = imageUrls.some((value) => /(^|\.)example\.com\b|assets\.example\.com/i.test(String(value || '')));
+      const sampleLink = landingUrls.some((value) => /(^|\/)example\.com\b|https:\/\/example\.com/i.test(String(value || '')));
+      return [sampleImage ? '示例图片地址' : '', sampleLink ? '示例落地页' : ''].filter(Boolean);
+    }
+
+    function updateExportMode() {
+      const reasons = demoDataReasons();
+      const isDemoExport = reasons.length > 0;
+      $('#exportModeNotice').hidden = !isDemoExport;
+      $('#downloadHtml').textContent = isDemoExport ? '下载演示HTML' : '下载HTML';
+      $('#copyHtml').textContent = isDemoExport ? '复制演示HTML' : '复制HTML源码';
+      return isDemoExport;
+    }
+
+    function splitActivityRow(module, imageSrc, imageAlt, reverse, theme, index) {
+      const direction = reverse ? ' dir="rtl"' : '';
+      const copyPadding = reverse ? '27px 26px 28px 0' : '27px 0 28px 26px';
+      const isPrimary = index === 0;
+      return `
+        <tr>
+          <td class="mobile-pad" style="padding:0 34px;">
+            <table role="presentation" class="layout-split module-row" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#ffffff" style="width:100%;table-layout:fixed;border-top:1px solid ${theme.cardBorder};background-color:#ffffff;"${direction}>
+              <tr>
+                <td class="mobile-col mobile-image-cell" width="43%" valign="middle" dir="ltr" style="width:43%;padding:26px 0 27px;">
+                  <a href="${emailUrl(module.imageLink)}" target="_blank">
+                    <img class="mobile-image" src="${emailImageUrl(imageSrc, theme.previewOnly)}" width="229" alt="${escapeHtml(imageAlt)}" style="display:block;width:100%;max-width:229px;height:auto;border:0;border-radius:8px;">
+                  </a>
+                </td>
+                <td class="mobile-col mobile-copy" width="57%" valign="middle" dir="ltr" style="width:57%;padding:${copyPadding};font-family:Arial,'Microsoft YaHei',sans-serif;color:${theme.text};word-break:break-word;">
+                  <div class="section-title" style="font-size:22px;line-height:30px;font-weight:700;"><a href="${emailUrl(module.titleLink)}" target="_blank" style="color:${theme.text};text-decoration:none;">${emailText(module.title)}</a></div>
+                  <div style="padding-top:9px;font-size:15px;line-height:24px;color:${theme.muted};">${emailText(module.body)}</div>
+                  ${moduleActionMarkup(module, theme, isPrimary)}
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>`;
+    }
+
+    function stackedActivityRow(module, imageSrc, imageAlt, emphasize, theme, index) {
+      const outerPadding = emphasize ? '14px 34px 22px' : '0 34px';
+      const copyPadding = emphasize ? '28px 30px 30px' : '24px 0 28px';
+      const titleClass = emphasize ? 'headline' : 'section-title';
+      const titleSize = emphasize ? '28px' : '23px';
+      const titleLine = emphasize ? '38px' : '31px';
+      const bodySize = '15px';
+      const bodyLine = emphasize ? '25px' : '23px';
+      const cardBackground = emphasize ? theme.cardAlt : '#ffffff';
+      const moduleClass = emphasize ? 'module-feature' : 'module-row';
+      const moduleStyle = emphasize
+        ? `border:1px solid ${theme.cardBorder};border-radius:8px;overflow:hidden;background-color:${cardBackground};`
+        : `border-top:1px solid ${theme.cardBorder};background-color:#ffffff;`;
+      const imageCellPadding = emphasize ? '' : 'padding-top:26px;';
+      return `
+        <tr>
+          <td class="mobile-pad" style="padding:${outerPadding};">
+            <table role="presentation" class="layout-featured ${moduleClass}" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="${cardBackground}" style="width:100%;${moduleStyle}">
+              <tr><td class="mobile-image-cell" style="${imageCellPadding}">
+                <a href="${emailUrl(module.imageLink)}" target="_blank"><img class="mobile-image" src="${emailImageUrl(imageSrc, theme.previewOnly)}" width="532" alt="${escapeHtml(imageAlt)}" style="display:block;width:100%;max-width:532px;height:auto;border:0;${emphasize ? '' : 'border-radius:8px;'}"></a>
+              </td></tr>
+              <tr><td class="mobile-copy" style="padding:${copyPadding};font-family:Arial,'Microsoft YaHei',sans-serif;color:${theme.text};word-break:break-word;">
+                <div class="${titleClass}" style="font-size:${titleSize};line-height:${titleLine};font-weight:700;"><a href="${emailUrl(module.titleLink)}" target="_blank" style="color:${theme.text};text-decoration:none;">${emailText(module.title)}</a></div>
+                <div style="padding-top:10px;font-size:${bodySize};line-height:${bodyLine};color:${theme.muted};">${emailText(module.body)}</div>
+                ${moduleActionMarkup(module, theme, index === 0)}
+              </td></tr>
+            </table>
+          </td>
+        </tr>`;
+    }
+
+    function explicitActivityRow(module, theme, index) {
+      const imageAlt = `${module.title}配图`;
+      if (module.layout === 'featured') return stackedActivityRow(module, module.imageUrl, imageAlt, true, theme, index);
+      if (module.layout === 'image-left') return splitActivityRow(module, module.imageUrl, imageAlt, false, theme, index);
+      if (module.layout === 'image-right') return splitActivityRow(module, module.imageUrl, imageAlt, true, theme, index);
+      return '';
+    }
+
+    function inspirationActivityRows(modules, theme) {
+      return modules.map((module, index) => {
+        const explicit = explicitActivityRow(module, theme, index);
+        if (explicit) return explicit;
+        const imageAlt = `${module.title}配图`;
+        if (theme.style === 'safe') return splitActivityRow(module, module.imageUrl, imageAlt, index % 2 === 1, theme, index);
+        if (theme.style === 'expressive') {
+          if (index === 0) return stackedActivityRow(module, module.imageUrl, imageAlt, true, theme, index);
+          if (index === 1) return stackedActivityRow(module, module.imageUrl, imageAlt, false, theme, index);
+          return splitActivityRow(module, module.imageUrl, imageAlt, index % 2 === 1, theme, index);
+        }
+        if (index === 0) return stackedActivityRow(module, module.imageUrl, imageAlt, true, theme, index);
+        const sequence = (index - 1) % 3;
+        if (sequence === 2) return stackedActivityRow(module, module.imageUrl, imageAlt, false, theme, index);
+        return splitActivityRow(module, module.imageUrl, imageAlt, sequence === 1, theme, index);
+      }).join('');
+    }
+
+    function productCardCell(entry, theme, side) {
+      if (!entry) return '<td class="mobile-col product-cell" width="50%" style="width:50%;font-size:0;line-height:0;">&nbsp;</td>';
+      const { module, index } = entry;
+      const sidePadding = side === 'left' ? '0 10px 22px 0' : '0 0 22px 10px';
+      return `<td class="mobile-col product-cell" width="50%" valign="top" style="width:50%;padding:${sidePadding};font-family:Arial,'Microsoft YaHei',sans-serif;color:${theme.text};word-break:break-word;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="${theme.cardAlt}" style="width:100%;border:1px solid ${theme.cardBorder};border-radius:6px;overflow:hidden;background-color:${theme.cardAlt};">
+          <tr><td><a href="${emailUrl(module.imageLink)}" target="_blank"><img class="mobile-image" src="${emailImageUrl(module.imageUrl, theme.previewOnly)}" width="250" alt="${escapeHtml(`${module.title}配图`)}" style="display:block;width:100%;max-width:250px;height:auto;border:0;"></a></td></tr>
+          <tr><td class="product-copy" style="padding:21px 20px 23px;">
+            <div class="section-title" style="font-size:21px;line-height:29px;font-weight:700;"><a href="${emailUrl(module.titleLink)}" target="_blank" style="color:${theme.text};text-decoration:none;">${emailText(module.title)}</a></div>
+            <div style="padding-top:8px;font-size:14px;line-height:23px;color:${theme.muted};">${emailText(module.body)}</div>
+            ${moduleActionMarkup(module, theme, index === 0)}
+          </td></tr>
+        </table>
+      </td>`;
+    }
+
+    function productGridRows(entries, theme) {
+      const rows = [];
+      for (let index = 0; index < entries.length; index += 2) {
+        rows.push(`<tr><td class="mobile-pad" style="padding:0 34px;"><table role="presentation" class="layout-product-grid module-row" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;table-layout:fixed;"><tr>${productCardCell(entries[index], theme, 'left')}${productCardCell(entries[index + 1], theme, 'right')}</tr></table></td></tr>`);
+      }
+      return rows.join('');
+    }
+
+    function productActivityRows(modules, theme) {
+      const rows = [];
+      let automaticEntries = [];
+      const flushAutomatic = () => {
+        if (!automaticEntries.length) return;
+        rows.push(productGridRows(automaticEntries, theme));
+        automaticEntries = [];
+      };
+      modules.forEach((module, index) => {
+        const explicit = explicitActivityRow(module, theme, index);
+        if (explicit) {
+          flushAutomatic();
+          rows.push(explicit);
+        } else {
+          automaticEntries.push({ module, index });
+        }
+      });
+      flushAutomatic();
+      return rows.join('');
+    }
+
+    function promotionLeadRow(module, theme, index) {
+      return `<tr><td class="mobile-pad" style="padding:10px 34px 28px;">
+        <table role="presentation" class="layout-promotion-lead module-feature" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="${theme.cardAlt}" style="width:100%;table-layout:fixed;border:1px solid ${theme.cardBorder};border-radius:6px;overflow:hidden;background-color:${theme.cardAlt};">
+          <tr>
+            <td class="mobile-col mobile-image-cell" width="46%" valign="middle" style="width:46%;padding:0;">
+              <a href="${emailUrl(module.imageLink)}" target="_blank"><img class="mobile-image" src="${emailImageUrl(module.imageUrl, theme.previewOnly)}" width="245" alt="${escapeHtml(`${module.title}配图`)}" style="display:block;width:100%;max-width:245px;height:auto;border:0;"></a>
+            </td>
+            <td class="mobile-col mobile-copy" width="54%" valign="middle" style="width:54%;padding:25px 25px 27px;font-family:Arial,'Microsoft YaHei',sans-serif;color:${theme.text};word-break:break-word;">
+              <div style="font-size:12px;line-height:18px;font-weight:700;color:${theme.accent};">主推活动</div>
+              <div class="headline" style="padding-top:6px;font-size:25px;line-height:34px;font-weight:700;"><a href="${emailUrl(module.titleLink)}" target="_blank" style="color:${theme.text};text-decoration:none;">${emailText(module.title)}</a></div>
+              <div style="padding-top:9px;font-size:14px;line-height:23px;color:${theme.muted};">${emailText(module.body)}</div>
+              ${moduleActionMarkup(module, theme, index === 0)}
+            </td>
+          </tr>
+        </table>
+      </td></tr>`;
+    }
+
+    function promotionActivityRows(modules, theme) {
+      return modules.map((module, index) => {
+        const explicit = explicitActivityRow(module, theme, index);
+        if (explicit) return explicit;
+        if (index === 0) return promotionLeadRow(module, theme, index);
+        return splitActivityRow(module, module.imageUrl, `${module.title}配图`, index % 2 === 0, theme, index);
+      }).join('');
+    }
+
+    function contentActivityRows(modules, theme) {
+      if (state.contentIntent === 'product') return productActivityRows(modules, theme);
+      if (state.contentIntent === 'promotion') return promotionActivityRows(modules, theme);
+      return inspirationActivityRows(modules, theme);
+    }
+
+    function moduleActionMarkup(module, theme, primary) {
+      if (primary) {
+        return `<table role="presentation" class="module-action primary-action" cellspacing="0" cellpadding="0" border="0" style="margin-top:19px;"><tr><td align="center" bgcolor="${theme.buttonBg}" style="border-radius:${theme.buttonRadius};mso-padding-alt:13px 22px;">
+          <a class="module-button module-button-primary" href="${emailUrl(module.ctaLink)}" target="_blank" style="display:inline-block;padding:13px 22px;border-radius:${theme.buttonRadius};font-family:Arial,'Microsoft YaHei',sans-serif;font-size:14px;line-height:20px;font-weight:700;color:${theme.buttonText};text-decoration:none;white-space:nowrap;">${emailText(module.cta)}&nbsp;&nbsp;→</a>
+        </td></tr></table>`;
+      }
+      return `<table role="presentation" class="module-action secondary-action" cellspacing="0" cellpadding="0" border="0" style="margin-top:11px;"><tr><td>
+        <a class="module-button module-button-secondary" href="${emailUrl(module.ctaLink)}" target="_blank" style="display:inline-block;padding:13px 0;border-bottom:1px solid ${theme.accent};font-family:Arial,'Microsoft YaHei',sans-serif;font-size:14px;line-height:20px;font-weight:700;color:${theme.accent};text-decoration:none;white-space:nowrap;">${emailText(module.cta)}&nbsp;&nbsp;→</a>
+      </td></tr></table>`;
+    }
+
+    function emailSectionTitle() {
+      if (state.contentIntent === 'product') return '本期精选';
+      if (state.contentIntent === 'promotion') return '活动内容';
+      return '本期灵感';
+    }
+
+    function emailIntroKicker() {
+      if (state.contentIntent === 'product') return '为你精选';
+      if (state.contentIntent === 'promotion') return '限时活动';
+      return '本期主题';
+    }
+
+    function emailIntroRow(theme, displaySubject, preheader, introKicker, options = {}) {
+      const background = options.background || theme.introBg;
+      const titleColor = options.titleColor || theme.introText;
+      const copyColor = options.copyColor || theme.introMuted;
+      const kickerColor = options.kickerColor || copyColor;
+      const padding = options.padding || theme.introPadding;
+      const titleSize = options.titleSize || '36px';
+      const titleLine = options.titleLine || '46px';
+      const intentClass = options.intentClass || '';
+      return `<tr><td class="mobile-pad email-intro lead-intro ${intentClass}" bgcolor="${background}" style="padding:${padding};background-color:${background};font-family:Arial,'Microsoft YaHei',sans-serif;word-break:break-word;">
+        ${introKicker ? `<div style="padding-bottom:9px;font-size:12px;line-height:18px;font-weight:700;color:${kickerColor};">${emailText(introKicker)}</div>` : ''}
+        <div class="intro-title" style="font-size:${titleSize};line-height:${titleLine};font-weight:700;color:${titleColor};">${emailText(displaySubject)}</div>
+        <div class="intro-copy" style="max-width:500px;padding-top:12px;font-size:16px;line-height:26px;color:${copyColor};">${emailText(preheader)}</div>
+      </td></tr>`;
+    }
+
+    function emailHeroRow(theme, heroImage, module, previewOnly, options = {}) {
+      const padding = options.padding === undefined ? theme.heroPadding : options.padding;
+      const radius = options.radius === undefined ? theme.heroRadius : options.radius;
+      const background = options.background || theme.canvas;
+      const intentClass = options.intentClass || '';
+      return `<tr><td class="lead-hero ${intentClass}" bgcolor="${background}" style="padding:${padding};background-color:${background};"><a href="${emailUrl(module.imageLink)}" target="_blank"><img class="hero-image" src="${emailImageUrl(heroImage, previewOnly)}" width="600" alt="${escapeHtml(module.title)}" style="display:block;width:100%;max-width:600px;height:auto;border:0;border-radius:${radius};"></a></td></tr>`;
+    }
+
+    function emailLeadRows(theme, displaySubject, preheader, introKicker, heroImage, modules, previewOnly) {
+      const intro = emailIntroRow(theme, displaySubject, preheader, introKicker, {
+        intentClass: `intent-${state.contentIntent}`,
+        titleSize: state.contentIntent === 'promotion' ? '38px' : '34px',
+        titleLine: state.contentIntent === 'promotion' ? '48px' : '44px'
+      });
+      const hero = emailHeroRow(theme, heroImage, modules[0], previewOnly, {
+        intentClass: `intent-${state.contentIntent}`,
+        padding: state.contentIntent === 'inspiration' && theme.style !== 'expressive' ? '0' : theme.heroPadding,
+        radius: state.contentIntent === 'inspiration' && theme.style !== 'expressive' ? '0' : theme.heroRadius
+      });
+      return state.contentIntent === 'inspiration' ? `${hero}${intro}` : `${intro}${hero}`;
+    }
+
+    function emailSectionHeaderRow(theme) {
+      return `<tr><td class="mobile-pad content-section-title" bgcolor="#ffffff" style="padding:34px 34px 15px;background-color:#ffffff;font-family:Arial,'Microsoft YaHei',sans-serif;color:${theme.text};">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"><tr>
+          <td nowrap style="font-family:Arial,'Microsoft YaHei',sans-serif;font-size:18px;line-height:26px;font-weight:700;color:${theme.text};">${emailText(emailSectionTitle())}</td>
+          <td width="100%" style="padding-left:16px;"><div style="border-top:1px solid ${theme.cardBorder};font-size:0;line-height:0;">&nbsp;</div></td>
+        </tr></table>
+      </td></tr>`;
+    }
+
+    function buildEmailHtml(options = {}) {
+      const previewOnly = options.previewOnly === true;
+      if (!previewOnly && !validateContent(true)) return '';
+      if (!previewOnly && !validateImageUrls(true)) return '';
+      if (!previewOnly && !validateAllLinks(false)) {
+        toast('跳转链接存在错误，请返回链接步骤修改');
+        return '';
+      }
+      const subject = fieldValue('subject', '(AD) 营销活动邮件');
+      const preheader = fieldValue('preheader', '查看本期活动内容。');
+      const company = fieldValue('companyName', '远屿旅行');
+      const emailLabel = fieldValue('emailLabel', '营销资讯');
+      const displaySubject = subject.replace(/^\(AD\)\s*/i, '').trim() || emailLabel;
+      const serviceLine = fieldValue('serviceLine', '{{service_phone}}');
+      const companyAddress = fieldValue('companyAddress', '{{company_address}}');
+      const privacyUrl = fieldValue('privacyUrl', '{{privacy_url}}');
+      const termsUrl = fieldValue('termsUrl', '{{terms_url}}');
+      const unsubscribeUrl = fieldValue('unsubscribeUrl', '{{unsubscribe_url}}');
+      const modules = state.modules.map((module) => {
+        const data = moduleData(module);
+        if (previewOnly) data.imageUrl = module.previewSrc || data.imageUrl;
+        return data;
+      });
+      const heroImage = previewOnly ? (state.heroPreviewSrc || fieldValue('heroUrl')) : fieldValue('heroUrl');
+      const theme = emailTheme();
+      theme.previewOnly = previewOnly;
+      if (state.contentIntent === 'promotion') {
+        theme.introBg = theme.accent;
+        theme.introText = readableText(theme.accent);
+        theme.introMuted = theme.introText === '#ffffff' ? mixHex(theme.accent, '#ffffff', 0.72) : mixHex(theme.accent, theme.text, 0.62);
+      }
+      const activityRows = contentActivityRows(modules, theme);
+      const introKicker = emailIntroKicker();
+      const leadRows = emailLeadRows(theme, displaySubject, preheader, introKicker, heroImage, modules, previewOnly);
+
+      return `<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>${emailText(subject)}</title>
+  <style>
+    html,body{margin:0!important;padding:0!important;width:100%!important;-webkit-text-size-adjust:100%!important;-ms-text-size-adjust:100%!important}
+    table,td{border-collapse:collapse!important;mso-table-lspace:0pt!important;mso-table-rspace:0pt!important;box-sizing:border-box}
+    img{border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic}
+    a{text-decoration:none}.preheader{display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;overflow:hidden;mso-hide:all}
+    @media only screen and (max-width:620px){.email-shell{width:100%!important;max-width:600px!important}.mobile-pad{padding-left:20px!important;padding-right:20px!important}.mobile-col{display:block!important;width:100%!important;max-width:100%!important;direction:ltr!important}.mobile-image-cell{padding:22px 0 0!important}.module-feature .mobile-image-cell{padding:0!important}.mobile-image,.hero-image{width:100%!important;max-width:100%!important;height:auto!important}.email-intro{padding-top:28px!important;padding-bottom:25px!important}.intro-title{font-size:24px!important;line-height:33px!important}.intro-copy{font-size:16px!important;line-height:25px!important}.content-section-title{padding-top:29px!important;padding-bottom:13px!important}.mobile-copy{padding:22px 0 27px!important}.module-feature .mobile-copy{padding:24px 22px 27px!important}.headline{font-size:27px!important;line-height:36px!important}.section-title{font-size:23px!important;line-height:31px!important}.product-cell{padding:0 0 18px!important}.product-copy{padding:21px 22px 24px!important}.module-button{white-space:normal!important}.primary-action{width:100%!important}.primary-action td{text-align:center!important}.module-button-primary{display:block!important}.footer-copy{font-size:12px!important;line-height:20px!important;word-break:break-word!important}}
+  </style>
+</head>
+<body class="intent-${state.contentIntent}" style="margin:0;padding:0;background-color:${theme.canvas};">
+  <span class="preheader">${emailText(preheader)}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</span>
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="${theme.canvas}" style="width:100%;background-color:${theme.canvas};">
+    <tr><td align="center" style="padding:28px 10px 36px;">
+      <!--[if mso]><table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0"><tr><td><![endif]-->
+      <table role="presentation" class="email-shell" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#ffffff" style="width:100%;max-width:600px;background-color:#ffffff;table-layout:fixed;">
+        <tr><td class="mobile-pad" bgcolor="${theme.headerBg}" style="padding:21px 34px;border-top:4px solid ${theme.headerRule};border-bottom:1px solid ${theme.cardBorder};background-color:${theme.headerBg};"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"><tr>
+          <td align="left" style="font-family:Arial,'Microsoft YaHei',sans-serif;font-size:19px;line-height:26px;font-weight:700;color:${theme.headerText};">${emailText(company)}</td>
+          <td align="right" style="font-family:Arial,'Microsoft YaHei',sans-serif;font-size:12px;line-height:19px;font-weight:700;color:${theme.headerLabel};">${emailText(emailLabel)}</td>
+        </tr></table></td></tr>
+        ${leadRows}
+        ${emailSectionHeaderRow(theme)}
+        ${activityRows}
+        <tr><td class="mobile-pad footer-copy" align="left" bgcolor="${theme.footerBg}" style="padding:34px 40px 38px;border-top:2px solid ${theme.accent};background-color:${theme.footerBg};font-family:Arial,'Microsoft YaHei',sans-serif;font-size:12px;line-height:21px;color:#7b8b91;word-break:break-word;">
+          <div style="padding-bottom:12px;font-size:16px;line-height:23px;font-weight:700;color:${theme.text};">${emailText(company)}</div>
+          <div>本邮件由系统自动发送，请勿直接回复。</div>
+          <div>您收到此邮件，是因为您曾订阅${emailText(company)}的营销资讯或相关优惠信息。</div>
+          <div style="padding-top:10px;"><a href="${emailUrl(privacyUrl)}" target="_blank" style="color:#586f79;text-decoration:underline;">隐私政策</a>&nbsp;|&nbsp;<a href="${emailUrl(termsUrl)}" target="_blank" style="color:#586f79;text-decoration:underline;">用户协议</a>&nbsp;|&nbsp;<a href="${emailUrl(unsubscribeUrl)}" target="_blank" style="color:#586f79;text-decoration:underline;">取消订阅</a></div>
+          <div style="padding-top:14px;">客服热线：${emailText(serviceLine)}</div>
+          <div>公司地址：${emailText(companyAddress)}</div>
+          <div style="padding-top:10px;">Copyright © ${new Date().getFullYear()} ${emailText(company)}。保留所有权利。</div>
+        </td></tr>
+      </table>
+      <!--[if mso]></td></tr></table><![endif]-->
+    </td></tr>
+  </table>
+</body>
+</html>`;
+    }
+
+    function generateEmail(showMessage = true) {
+      const html = buildEmailHtml();
+      if (!html) return false;
+      state.generatedHtml = html;
+      const pageHref = window.location && window.location.href ? window.location.href : '';
+      const previewBase = pageHref ? new URL('.', pageHref).href : '';
+      let previewHtml = previewBase
+        ? html.replace('<head>', `<head>\n  <base href="${escapeHtml(previewBase)}">`)
+        : html;
+      const previewPairs = [[fieldValue('heroUrl'), state.heroPreviewSrc]];
+      state.modules.forEach((module) => previewPairs.push([String(module.imageUrl || '').trim(), module.previewSrc]));
+      previewPairs.forEach(([source, preview]) => {
+        if (!source || !isPreviewAssetSource(preview) || source === preview) return;
+        previewHtml = previewHtml.split(escapeHtml(source)).join(escapeHtml(preview));
+      });
+      const previewStatus = $('#previewImageStatus');
+      previewStatus.className = 'preview-status';
+      previewStatus.textContent = '正在载入图片';
+      $('#emailFrame').srcdoc = previewHtml;
+      $('#sourceOutput').value = html;
+      $('#subjectOutput').value = fieldValue('subject', '(AD) 营销活动邮件');
+      const customCount = state.modules.filter((module) => module.layout !== 'auto').length;
+      $('#sourceMeta').textContent = `${Math.round(new Blob([html]).size / 1024)}KB · ${customCount ? `手动调整${customCount}项` : '自动排版'} · 外链图片版本`;
+      if (showMessage) toast('邮件HTML已重新生成');
+      updateExportMode();
+      updateSummary();
+      return true;
+    }
+
+    function updatePreviewImageStatus(attempt = 0) {
+      const frame = $('#emailFrame');
+      const status = $('#previewImageStatus');
+      if (!frame || !status) return;
+      if (state.previewImagesOff) {
+        status.className = 'preview-status';
+        status.textContent = '正在检查图片关闭时的阅读效果';
+        return;
+      }
+      try {
+        const images = Array.from(frame.contentDocument?.images || []);
+        const failed = images.filter((image) => image.complete && image.naturalWidth === 0).length;
+        const pending = images.filter((image) => !image.complete).length;
+        if (pending && attempt < 24) {
+          status.className = 'preview-status';
+          status.textContent = `正在载入 ${pending} 张图片`;
+          setTimeout(() => updatePreviewImageStatus(attempt + 1), 180);
+          return;
+        }
+        if (pending) {
+          status.className = 'preview-status warn';
+          status.textContent = `${pending} 张图片载入超时`;
+          return;
+        }
+        status.className = `preview-status ${failed ? 'warn' : 'ok'}`;
+        status.textContent = failed ? `${failed} 张图片未加载` : `${images.length} 张图片已加载`;
+      } catch (error) {
+        status.className = 'preview-status warn';
+        status.textContent = '请检查图片地址';
+      }
+    }
+
+    function updatePreviewToolState() {
+      const imageButton = $('#previewImagesToggle');
+      const darkButton = $('#previewDarkToggle');
+      if (imageButton) {
+        imageButton.classList.toggle('active', state.previewImagesOff);
+        imageButton.setAttribute('aria-pressed', String(state.previewImagesOff));
+      }
+      if (darkButton) {
+        darkButton.classList.toggle('active', state.previewDarkMode);
+        darkButton.setAttribute('aria-pressed', String(state.previewDarkMode));
+      }
+      const windowElement = $('#previewWindow');
+      if (windowElement) windowElement.classList.toggle('dark-simulation', state.previewDarkMode);
+    }
+
+    function applyPreviewScenario() {
+      updatePreviewToolState();
+      const frame = $('#emailFrame');
+      const documentRoot = frame?.contentDocument;
+      if (!documentRoot) return;
+      const styleId = 'email-preview-simulation';
+      let style = documentRoot.getElementById(styleId);
+      if (!style && documentRoot.head) {
+        style = documentRoot.createElement('style');
+        style.id = styleId;
+        documentRoot.head.appendChild(style);
+      }
+      if (style) {
+        style.textContent = state.previewDarkMode
+          ? 'html{background:#111918!important}body{background:#111918!important;filter:invert(.88) hue-rotate(180deg)}img{filter:invert(1) hue-rotate(180deg)}'
+          : '';
+      }
+      Array.from(documentRoot.images || []).forEach((image) => {
+        if (!image.dataset.previewOriginalSrc) image.dataset.previewOriginalSrc = image.getAttribute('src') || '';
+        if (state.previewImagesOff) image.removeAttribute('src');
+        else if (!image.getAttribute('src') && image.dataset.previewOriginalSrc) image.setAttribute('src', image.dataset.previewOriginalSrc);
+      });
+      updatePreviewImageStatus();
+    }
+
+    function downloadBlob(content, type, filename) {
+      const url = URL.createObjectURL(new Blob([content], { type }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function toast(message) {
+      const el = $('#toast');
+      el.textContent = message;
+      el.classList.add('show');
+      clearTimeout(toast.timer);
+      toast.timer = setTimeout(() => el.classList.remove('show'), 2600);
+    }
+
+    function invalidateExportConfirmation() {
+      const confirmation = $('#riskConfirm');
+      if (confirmation) confirmation.checked = false;
+    }
+
+    function saveDraft() {
+      try {
+        const fields = {};
+        draftFieldIds.forEach((id) => {
+          const element = document.getElementById(id);
+          if (element) fields[id] = element.value;
+        });
+        localStorage.setItem(draftKey, JSON.stringify({
+          fields,
+          assetMode: state.assetMode,
+          visualStyle: state.visualStyle,
+          contentIntent: state.contentIntent,
+          contentIntentSource: state.contentIntentSource,
+          assets: state.assets.filter((asset) => !asset.src.startsWith('blob:')),
+          modules: state.modules.map((module) => ({
+            ...module,
+            previewSrc: isPreviewAssetSource(module.previewSrc) ? module.previewSrc : ''
+          })),
+          moduleSeed: state.moduleSeed
+        }));
+        $('#saveState').textContent = '草稿已保存';
+      } catch (error) {
+        $('#saveState').textContent = '当前环境无法保存草稿';
+      }
+    }
+
+    function scheduleDraftSave() {
+      $('#saveState').textContent = '正在保存';
+      clearTimeout(scheduleDraftSave.timer);
+      scheduleDraftSave.timer = setTimeout(saveDraft, 350);
+    }
+
+    function schedulePreviewRefresh() {
+      state.generatedHtml = '';
+      if (state.step < 4) return;
+      clearTimeout(schedulePreviewRefresh.timer);
+      schedulePreviewRefresh.timer = setTimeout(() => generateEmail(false), 450);
+    }
+
+    function restoreDraft() {
+      try {
+        const raw = localStorage.getItem(draftKey);
+        if (!raw) return;
+        const draft = JSON.parse(raw);
+        Object.entries(draft.fields || {}).forEach(([id, value]) => {
+          const element = document.getElementById(id);
+          if (element && id !== 'personalToken') {
+            const legacyHero = id === 'heroUrl' && /^https:\/\/picsum\.photos\/seed\/yuanyu-/i.test(String(value || ''));
+            element.value = legacyHero ? sampleImageUrls.heroUrl : value;
+          }
+        });
+        state.visualStyle = visualVariantOrder.includes(draft.visualStyle) ? draft.visualStyle : recommendedVisualStyle();
+        state.heroPreviewSrc = fieldValue('heroUrl') === sampleImageUrls.heroUrl ? 'assets/demo/hero.jpg' : fieldValue('heroUrl');
+        if (draft.assetMode) setAssetMode(draft.assetMode, { silent: true, skipSave: true });
+        if (Array.isArray(draft.assets)) {
+          const sampleAssetsByName = Object.fromEntries(sampleAssets.map((asset) => [asset.name, asset]));
+          state.assets = draft.assets.map((asset) => sampleAssetsByName[asset && asset.name] || asset)
+            .filter((asset) => asset && asset.name && isPreviewAssetSource(asset.src));
+        }
+        if (Array.isArray(draft.modules) && draft.modules.length) {
+          const defaultModulesById = Object.fromEntries(createDefaultModules().map((module) => [module.id, module]));
+          state.modules = draft.modules.slice(0, maxModuleCount).map((module, index) => {
+            const id = /^m\d+$/.test(module.id || '') ? module.id : `m${index + 1}`;
+            const defaultModule = defaultModulesById[id];
+            const legacySample = /^https:\/\/picsum\.photos\/seed\/yuanyu-/i.test(String(module.imageUrl || ''));
+            return {
+              id,
+              title: String(module.title || ''), cta: String(module.cta || ''), body: String(module.body || ''),
+              imageUrl: legacySample && defaultModule ? defaultModule.imageUrl : String(module.imageUrl || ''),
+              previewSrc: legacySample && defaultModule ? defaultModule.previewSrc : (isPreviewAssetSource(module.previewSrc) ? module.previewSrc : ''),
+              link: String(module.link || ''), track: String(module.track || `module_${index + 1}`), lock: module.lock !== false,
+              layout: ['auto', 'featured', 'image-left', 'image-right'].includes(module.layout) ? module.layout : 'auto',
+              imageLink: String(module.imageLink || ''), titleLink: String(module.titleLink || ''), ctaLink: String(module.ctaLink || '')
+            };
+          });
+          const highestId = Math.max(...state.modules.map((module) => Number(module.id.slice(1)) || 0));
+          state.moduleSeed = Math.max(Number(draft.moduleSeed) || 1, highestId + 1);
+        }
+        state.contentIntentSource = draft.contentIntentSource === 'manual' ? 'manual' : 'auto';
+        state.contentIntent = contentIntentDetails[draft.contentIntent] ? draft.contentIntent : inferContentIntent();
+        if (state.contentIntentSource === 'auto') state.contentIntent = inferContentIntent();
+        $('#saveState').textContent = '已恢复本机草稿';
+      } catch (error) {
+        $('#saveState').textContent = '草稿保存在本机';
+      }
+    }
+
+    function setStep(nextStep, options = {}) {
+      let target = Math.max(0, Math.min(5, Number(nextStep)));
+      if (target > state.step && target >= 1 && !state.demoMode && !state.tokenReady) {
+        toast('请先连接个人 API Key，或进入演示模式');
+        target = 0;
+      }
+      if (target > state.step && target >= 2 && state.assets.length === 0) {
+        toast('请先上传图片素材，或载入示例');
+        target = 1;
+      }
+      if (target > state.step && target >= 3) {
+        const contentReady = validateContent(true);
+        const imagesReady = validateImageUrls(contentReady);
+        if (!contentReady || !imagesReady) target = 2;
+      }
+      if (target >= 3) renderLinkModules();
+      if (target >= 4 && !validateAllLinks(false)) {
+        target = 3;
+        toast('请先完成跳转链接配置');
+      }
+      state.step = target;
+      if (state.step >= 4 && !state.generatedHtml) generateEmail(false);
+      $$('.step-button').forEach((button) => {
+        const index = Number(button.dataset.step);
+        button.classList.toggle('active', index === state.step);
+        button.classList.toggle('completed', index < state.step);
+        $('.step-index', button).textContent = index < state.step ? '✓' : String(index + 1);
+        if (index === state.step) button.setAttribute('aria-current', 'step');
+        else button.removeAttribute('aria-current');
+      });
+      $$('.step-panel').forEach((panel) => panel.classList.toggle('active', Number(panel.dataset.panel) === state.step));
+      $$('.workspace > .panel').forEach((panel) => { panel.scrollTop = 0; });
+      $('#pageTitle').textContent = stepContent[state.step][0];
+      $('#pageCopy').textContent = stepContent[state.step][1];
+      $('#stepCounter').textContent = `第${state.step + 1}步，共6步`;
+      $('#summaryStep').textContent = `第${state.step + 1}步，共6步`;
+      $('#summaryHeading').textContent = stepNames[state.step];
+      $('#summaryNext').textContent = nextNames[state.step];
+      $('#progressFill').style.width = `${((state.step + 1) / stepContent.length) * 100}%`;
+      $('#progressTrack').setAttribute('aria-valuenow', String(state.step + 1));
+
+      const showEmail = state.step >= 4;
+      $('#appLayout').classList.toggle('preview-focus', showEmail);
+      $('.workspace').classList.toggle('preview-mode', showEmail);
+      if (!state.sidebarPreferenceSet && usesDesktopWorkspace()) {
+        setSidebarCollapsed(showEmail, false);
+      }
+      $('#summaryPreview').hidden = showEmail;
+      $('#emailPreview').hidden = !showEmail;
+      $('#previewTitle').textContent = showEmail ? '邮件实时预览' : '本次任务';
+      $('#previewCopy').textContent = showEmail ? `${fieldValue('companyName', '营销邮件')}邮件预览` : previewCopyForStep();
+      if (showEmail && window.matchMedia && window.matchMedia('(max-width: 760px)').matches) {
+        $$('.preview-switch button').forEach((button) => {
+          const active = button.dataset.viewport === 'mobile';
+          button.classList.toggle('active', active);
+          button.setAttribute('aria-pressed', String(active));
+        });
+        $('#previewWindow').classList.add('mobile');
+      }
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      const activeStepButton = $('.step-button.active');
+      if (activeStepButton && typeof activeStepButton.scrollIntoView === 'function') {
+        activeStepButton.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+      }
+      if (state.step >= 5) validateExportFields(false);
+      updateSummary();
+      if (!options.skipSave) scheduleDraftSave();
+    }
+
+    function openNewEmailDialog() {
+      $('#newEmailDialog').hidden = false;
+      $('#cancelNewEmail').focus();
+    }
+
+    function closeNewEmailDialog() {
+      $('#newEmailDialog').hidden = true;
+      $('#newEmail').focus();
+    }
+
+    function startNewEmail() {
+      state.assets.forEach((asset) => { if ((asset.src || '').startsWith('blob:')) URL.revokeObjectURL(asset.src); });
+      state.assetMode = 'assets';
+      state.visualStyle = 'brand';
+      state.contentIntent = 'inspiration';
+      state.contentIntentSource = 'auto';
+      state.assets = [];
+      state.modules = [createBlankModule()];
+      state.moduleSeed = 2;
+      state.heroPreviewSrc = '';
+      state.generatedHtml = '';
+      state.linksChecked = false;
+      state.linkReady = false;
+      const blankValues = {
+        subject: '(AD) ', preheader: '', companyName: '', emailLabel: '', serviceLine: '{{service_phone}}',
+        heroUrl: '', brandColor: visualStyleDefaults.brand.brandColor, canvasColor: visualStyleDefaults.brand.canvasColor,
+        campaignCode: 'campaign', companyAddress: '', privacyUrl: '', termsUrl: '', unsubscribeUrl: ''
+      };
+      Object.entries(blankValues).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) element.value = value;
+      });
+      $('#fileInput').value = '';
+      $('#riskConfirm').checked = false;
+      $('#sourceOutput').value = '';
+      $('#subjectOutput').value = '';
+      $('#sourceMeta').textContent = '尚未生成';
+      setAssetMode('assets', { silent: true, skipSave: true });
+      renderAssets();
+      renderContentModules();
+      renderLinkModules();
+      resetLinkCheckState();
+      updateContentIntentSummary();
+      updateVisualSummary();
+      validateExportFields(false);
+      try { localStorage.removeItem(draftKey); } catch (error) {}
+      closeNewEmailDialog();
+      setStep(0, { skipSave: true });
+      saveDraft();
+      toast('已新建空白邮件');
+    }
+
+    function previewCopyForStep() {
+      if (state.step === 0) return '填写个人 API Key，或直接体验Demo。';
+      if (state.step === 1) return '上传长图，或提供独立图片素材。';
+      if (state.step === 2) return '核对文案和图片外链。';
+      if (state.step === 3) return '检查图片、标题和按钮的跳转地址。';
+      return '完成必要信息后导出。';
+    }
+
+    function updateSummary() {
+      $('#summaryToken').textContent = state.demoMode ? '演示模式' : (state.tokenReady ? 'API Key 已录入（Demo）' : '未连接');
+      $('#summaryAssets').textContent = state.assets.length ? `${state.assets.length}张图片已就绪` : '等待上传';
+      $('#summaryLinks').textContent = !state.linksChecked ? '尚未检查' : (state.linkReady ? '格式通过' : '需要修改');
+      $('#summaryChecks').textContent = state.generatedHtml ? (state.step >= 5 ? '检查清单已生成' : 'HTML已生成') : (state.linksChecked ? (state.linkReady ? '链接格式通过' : '存在待修改项') : '尚未开始');
+      updateExportMode();
+    }
+
+    function setAssetMode(mode, options = {}) {
+      const changed = state.assetMode !== mode;
+      if (changed && state.assets.length) {
+        state.assets.forEach((asset) => { if (asset.src.startsWith('blob:')) URL.revokeObjectURL(asset.src); });
+        state.assets = [];
+        state.modules.forEach((module) => { if ((module.previewSrc || '').startsWith('blob:')) module.previewSrc = module.imageUrl; });
+        state.generatedHtml = '';
+      }
+      state.assetMode = mode;
+      $$('.segment').forEach((button) => {
+        const active = button.dataset.mode === mode;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', String(active));
+      });
+      $('#fileInput').multiple = mode === 'assets';
+      $('#dropTitle').textContent = mode === 'poster' ? '拖入一张营销长图' : '拖入多张独立图片';
+      $('#dropCopy').textContent = mode === 'poster'
+        ? '支持PNG、JPG和WebP，单张不超过15MB。选择后先在浏览器本地压缩，再用于识别。'
+        : '建议分别提供头图和内容图，单张不超过15MB，最多8张。选择后先在浏览器本地压缩。';
+      if (changed) {
+        invalidateExportConfirmation();
+        renderAssets();
+        if (!options.silent) toast('素材方式已切换，请按当前方式重新载入图片');
+      }
+      if (!options.skipSave) scheduleDraftSave();
+    }
+
+    function renderAssets() {
+      const list = $('#assetList');
+      if (!state.assets.length) {
+        list.innerHTML = '<div class="notice"><strong>等待素材</strong><span>载入示例可以立即体验后续流程。</span></div>';
+        updateSummary();
+        return;
+      }
+      list.innerHTML = state.assets.map((asset) => `
+        <div class="asset-row">
+          <img class="asset-thumb" src="${escapeHtml(asset.src)}" alt="${escapeHtml(asset.name)}预览">
+          <div><div class="asset-name">${escapeHtml(asset.name)}</div><div class="asset-meta">${escapeHtml(asset.meta)}</div></div>
+          <div class="asset-state">${asset.compressed ? '已压缩' : '可用于识别'}</div>
+        </div>
+      `).join('');
+      updateSummary();
+    }
+
+    function formatBytes(bytes) {
+      if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))}KB`;
+      return `${(bytes / 1024 / 1024).toFixed(1)}MB`;
+    }
+
+    async function compressImageForModel(file) {
+      if (!window.createImageBitmap) return { blob: file, width: 0, height: 0, compressed: false };
+      let bitmap;
+      try {
+        bitmap = await createImageBitmap(file);
+        const maxEdge = state.assetMode === 'poster' ? 2200 : 1600;
+        const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height));
+        const width = Math.max(1, Math.round(bitmap.width * scale));
+        const height = Math.max(1, Math.round(bitmap.height * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext('2d');
+        if (!context || !canvas.toBlob) return { blob: file, width: bitmap.width, height: bitmap.height, compressed: false };
+        context.drawImage(bitmap, 0, 0, width, height);
+        const compressedBlob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/webp', 0.86));
+        if (!compressedBlob || compressedBlob.size >= file.size) {
+          return { blob: file, width: bitmap.width, height: bitmap.height, compressed: false };
+        }
+        return { blob: compressedBlob, width, height, compressed: true };
+      } catch (error) {
+        return { blob: file, width: 0, height: 0, compressed: false };
+      } finally {
+        if (bitmap && bitmap.close) bitmap.close();
+      }
+    }
+
+    async function loadFiles(files) {
+      const acceptedTypes = new Set(['image/png', 'image/jpeg', 'image/webp']);
+      const selectedFiles = Array.from(files);
+      const imageFiles = selectedFiles.filter((file) => acceptedTypes.has(file.type) && file.size <= maxImageBytes);
+      const rejectedCount = selectedFiles.length - imageFiles.length;
+      if (!imageFiles.length) { toast('请选择15MB以内的PNG、JPG或WebP图片'); return; }
+      state.assets.forEach((asset) => { if (asset.src.startsWith('blob:')) URL.revokeObjectURL(asset.src); });
+      const limited = state.assetMode === 'poster' ? imageFiles.slice(0, 1) : imageFiles.slice(0, maxAssetCount);
+      const cappedCount = imageFiles.length - limited.length;
+      $('#assetList').innerHTML = '<div class="notice"><strong>正在本地压缩</strong><span>图片不会在这一步上传。</span></div>';
+      const processed = await Promise.all(limited.map(async (file) => ({ file, result: await compressImageForModel(file) })));
+      state.assets = processed.map(({ file, result }) => ({
+        name: file.name,
+        originalBytes: file.size,
+        processedBytes: result.blob.size,
+        compressed: result.compressed,
+        meta: result.compressed
+          ? `${formatBytes(file.size)} → ${formatBytes(result.blob.size)} · 本地压缩`
+          : `${formatBytes(file.size)} · 原图用于识别`,
+        src: URL.createObjectURL(result.blob)
+      }));
+      Object.keys(sampleImageUrls).forEach((id) => { document.getElementById(id).value = ''; });
+      state.heroPreviewSrc = state.assets[0]?.src || '';
+      $('#heroAssetPreview').src = state.heroPreviewSrc || 'assets/demo/hero.jpg';
+      updateVisualSummary();
+      state.modules.forEach((module, index) => {
+        module.imageUrl = '';
+        module.previewSrc = state.assets[index + 1]?.src || state.assets[index]?.src || '';
+      });
+      state.generatedHtml = '';
+      state.linksChecked = false;
+      state.linkReady = false;
+      invalidateExportConfirmation();
+      renderAssets();
+      renderContentModules();
+      renderLinkModules();
+      const skipped = rejectedCount + cappedCount;
+      if (skipped) {
+        toast(`已载入${state.assets.length}张图片，${skipped}张因格式、体积或数量限制未载入`);
+      } else {
+        toast(state.assetMode === 'poster' ? '长图已在本地处理，下一步接入模型拆解' : `${state.assets.length}张图片已处理，还需填写公开图片地址`);
+      }
+    }
+
+    function useDemo() {
+      state.demoMode = true;
+      state.tokenReady = false;
+      $('#personalToken').value = '';
+      $('#tokenError').classList.remove('show');
+      updateSummary();
+      toast('已进入演示模式，不会产生模型费用');
+    }
+
+    $$('.step-button').forEach((button) => button.addEventListener('click', () => setStep(button.dataset.step)));
+    $('#sidebarToggle').addEventListener('click', () => setSidebarCollapsed(!state.sidebarCollapsed, true));
+    $$('.next').forEach((button) => button.addEventListener('click', () => setStep(button.dataset.next)));
+    $$('.prev').forEach((button) => button.addEventListener('click', () => setStep(button.dataset.prev)));
+    $$('.segment').forEach((button) => button.addEventListener('click', () => setAssetMode(button.dataset.mode)));
+    $('#openVisualStudio').addEventListener('click', openVisualStudio);
+    $('#closeVisualStudio').addEventListener('click', closeVisualStudio);
+    $('#shuffleVisual').addEventListener('click', shuffleVisualStyle);
+    $('#resetAutoLayouts').addEventListener('click', resetAutoLayouts);
+    $('#toggleContentIntent').addEventListener('click', () => {
+      const choices = $('#contentIntentChoices');
+      const expanded = choices.hidden;
+      choices.hidden = !expanded;
+      $('#toggleContentIntent').setAttribute('aria-expanded', String(expanded));
+      $('#toggleContentIntent').textContent = expanded ? '收起' : '调整理解';
+    });
+    $$('input[name="contentIntent"]').forEach((input) => input.addEventListener('change', () => {
+      if (input.checked) setContentIntent(input.value, true);
+    }));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !$('#visualStudio').hidden) closeVisualStudio();
+    });
+    [$('#studioDesktop'), $('#studioMobile')].forEach((button) => button.addEventListener('click', () => {
+      [$('#studioDesktop'), $('#studioMobile')].forEach((item) => {
+        const active = item === button;
+        item.classList.toggle('active', active);
+        item.setAttribute('aria-pressed', String(active));
+      });
+      $('#visualStudioFrame').classList.toggle('mobile', button.dataset.studioViewport === 'mobile');
+    }));
+
+    $('#testToken').addEventListener('click', () => {
+      const value = $('#personalToken').value.trim();
+      if (!value) {
+        $('#tokenError').classList.add('show');
+        $('#personalToken').setAttribute('aria-invalid', 'true');
+        return;
+      }
+      $('#tokenError').classList.remove('show');
+      $('#personalToken').setAttribute('aria-invalid', 'false');
+      $('#testToken').disabled = true;
+      $('#testToken').textContent = '检测中';
+      setTimeout(() => {
+        state.tokenReady = true;
+        state.demoMode = false;
+        $('#testToken').disabled = false;
+        $('#testToken').textContent = 'Demo已就绪';
+        updateSummary();
+        toast('Demo未发起真实连接，仅演示后续流程');
+      }, 650);
+    });
+    $('#demoMode').addEventListener('click', useDemo);
+    $('#newEmail').addEventListener('click', openNewEmailDialog);
+    $('#cancelNewEmail').addEventListener('click', closeNewEmailDialog);
+    $('#confirmNewEmail').addEventListener('click', startNewEmail);
+    $('#newEmailDialog').addEventListener('click', (event) => { if (event.target === $('#newEmailDialog')) closeNewEmailDialog(); });
+
+    $('#loadSample').addEventListener('click', () => {
+      setAssetMode('assets');
+      state.assets = sampleAssets.slice();
+      state.modules = createDefaultModules();
+      state.moduleSeed = 5;
+      state.contentIntentSource = 'auto';
+      state.contentIntent = inferContentIntent();
+      state.visualStyle = recommendedVisualStyle();
+      updateContentIntentSummary();
+      state.heroPreviewSrc = 'assets/demo/hero.jpg';
+      $('#heroAssetPreview').src = state.heroPreviewSrc;
+      updateVisualSummary();
+      Object.entries(sampleFieldValues).forEach(([id, value]) => { document.getElementById(id).value = value; });
+      Object.entries(sampleImageUrls).forEach(([id, value]) => { document.getElementById(id).value = value; });
+      state.generatedHtml = '';
+      state.linksChecked = false;
+      state.linkReady = false;
+      invalidateExportConfirmation();
+      renderAssets();
+      renderContentModules();
+      renderLinkModules();
+      toast('已载入5张中性示例图片');
+    });
+    $('#clearAssets').addEventListener('click', () => {
+      state.assets.forEach((asset) => { if (asset.src.startsWith('blob:')) URL.revokeObjectURL(asset.src); });
+      state.assets = [];
+      state.heroPreviewSrc = '';
+      $('#heroAssetPreview').src = 'assets/demo/hero.jpg';
+      updateVisualSummary();
+      state.modules.forEach((module) => { if ((module.previewSrc || '').startsWith('blob:')) module.previewSrc = module.imageUrl; });
+      state.generatedHtml = '';
+      state.linksChecked = false;
+      state.linkReady = false;
+      invalidateExportConfirmation();
+      $('#fileInput').value = '';
+      renderAssets();
+      renderContentModules();
+      renderLinkModules();
+    });
+    $('#fileInput').addEventListener('change', (event) => loadFiles(event.target.files));
+    const dropzone = $('#dropzone');
+    ['dragenter', 'dragover'].forEach((type) => dropzone.addEventListener(type, (event) => { event.preventDefault(); dropzone.classList.add('drag'); }));
+    ['dragleave', 'drop'].forEach((type) => dropzone.addEventListener(type, (event) => { event.preventDefault(); dropzone.classList.remove('drag'); }));
+    dropzone.addEventListener('drop', (event) => loadFiles(event.dataTransfer.files));
+
+    $$('.preview-switch button').forEach((button) => button.addEventListener('click', () => {
+      $$('.preview-switch button').forEach((item) => {
+        const active = item === button;
+        item.classList.toggle('active', active);
+        item.setAttribute('aria-pressed', String(active));
+      });
+      $('#previewWindow').classList.toggle('mobile', button.dataset.viewport === 'mobile');
+    }));
+
+    $('#previewImagesToggle').addEventListener('click', () => {
+      state.previewImagesOff = !state.previewImagesOff;
+      applyPreviewScenario();
+    });
+    $('#previewDarkToggle').addEventListener('click', () => {
+      state.previewDarkMode = !state.previewDarkMode;
+      applyPreviewScenario();
+    });
+
+    $('#emailFrame').addEventListener('load', () => setTimeout(applyPreviewScenario, 80));
+
+    $('#generatePreview').addEventListener('click', () => {
+      if (!validateAllLinks(true)) return;
+      if (generateEmail(false)) setStep(4);
+    });
+
+    $('#addModule').addEventListener('click', addModule);
+    $('#contentModuleList').addEventListener('click', (event) => {
+      const button = event.target.closest('[data-module-action]');
+      if (!button || button.disabled) return;
+      const { moduleId, moduleAction } = button.dataset;
+      if (moduleAction === 'up') moveModule(moduleId, -1);
+      if (moduleAction === 'down') moveModule(moduleId, 1);
+      if (moduleAction === 'remove') removeModule(moduleId);
+    });
+    $('#studioModuleList').addEventListener('click', (event) => {
+      const button = event.target.closest('[data-module-action]');
+      if (!button || button.disabled) return;
+      const { moduleId, moduleAction } = button.dataset;
+      if (moduleAction === 'up') moveModule(moduleId, -1);
+      if (moduleAction === 'down') moveModule(moduleId, 1);
+    });
+    $('#studioModuleList').addEventListener('change', (event) => {
+      if (!Object.prototype.hasOwnProperty.call(event.target.dataset || {}, 'studioLayout')) return;
+      const item = event.target.closest('[data-module-id]');
+      const module = item ? moduleById(item.dataset.moduleId) : null;
+      if (!module) return;
+      module.layout = event.target.value;
+      state.generatedHtml = '';
+      invalidateExportConfirmation();
+      renderContentModules();
+      updateLayoutOverrideNotice();
+      renderVisualStudioPreview();
+      scheduleDraftSave();
+    });
+    function updateContentModuleField(event) {
+      const field = event.target.dataset.moduleField;
+      const item = event.target.closest('[data-module-id]');
+      if (!field || !item) return;
+      const module = moduleById(item.dataset.moduleId);
+      if (!module) return;
+      module[field] = event.target.value;
+      if (field === 'title') {
+        const summaryTitle = $(`#module-${module.id}-summary-title`);
+        if (summaryTitle) summaryTitle.textContent = event.target.value.trim() || '待填写标题';
+      }
+      if (field === 'layout') updateLayoutOverrideNotice();
+      if (['title', 'body', 'cta'].includes(field)) refreshInferredContentIntent();
+      if (field === 'imageUrl' && isSafeHttpsImageUrl(event.target.value)) {
+        module.previewSrc = event.target.value;
+        const image = $('.module-thumb', item);
+        if (image) image.src = event.target.value;
+      }
+      state.generatedHtml = '';
+      state.linksChecked = false;
+      state.linkReady = false;
+      invalidateExportConfirmation();
+      scheduleDraftSave();
+      schedulePreviewRefresh();
+      updateModuleMetrics();
+      renderStudioModules();
+      renderVisualStudioPreview();
+      updateExportMode();
+    }
+
+    $('#contentModuleList').addEventListener('input', updateContentModuleField);
+    $('#contentModuleList').addEventListener('change', (event) => {
+      if (event.target.dataset.moduleField === 'layout') updateContentModuleField(event);
+    });
+
+    $('#linkModuleList').addEventListener('input', (event) => {
+      const field = event.target.dataset.linkField;
+      const item = event.target.closest('[data-module-id]');
+      if (!field || !item) return;
+      const module = moduleById(item.dataset.moduleId);
+      if (!module) return;
+      module[field] = field === 'lock' ? event.target.checked : event.target.value;
+      if (field === 'lock') $(`#link-${module.id}-advanced`).hidden = module.lock;
+      state.generatedHtml = '';
+      state.linksChecked = false;
+      state.linkReady = false;
+      invalidateExportConfirmation();
+      resetLinkCheckState();
+      scheduleDraftSave();
+    });
+    $('#campaignCode').addEventListener('input', () => {
+      state.generatedHtml = '';
+      state.linksChecked = false;
+      state.linkReady = false;
+      invalidateExportConfirmation();
+      resetLinkCheckState();
+      scheduleDraftSave();
+    });
+
+    draftFieldIds.forEach((id) => {
+      const element = document.getElementById(id);
+      if (!element) return;
+      element.addEventListener('input', () => {
+        if (id === 'heroUrl' && isSafeHttpsImageUrl(element.value)) state.heroPreviewSrc = element.value;
+        if (id === 'heroUrl') {
+          $('#heroAssetPreview').src = state.heroPreviewSrc || element.value || 'assets/demo/hero.jpg';
+          updateVisualSummary();
+        }
+        if (id === 'brandColor' || id === 'canvasColor') renderVisualStudioPreview();
+        if (['subject', 'preheader', 'emailLabel'].includes(id)) refreshInferredContentIntent();
+        invalidateExportConfirmation();
+        scheduleDraftSave();
+        schedulePreviewRefresh();
+        if (['companyAddress', 'privacyUrl', 'termsUrl', 'unsubscribeUrl'].includes(id)) validateExportFields(false);
+        updateExportMode();
+      });
+      element.addEventListener('change', () => {
+        if (id === 'heroUrl' && isSafeHttpsImageUrl(element.value)) state.heroPreviewSrc = element.value;
+        if (id === 'heroUrl') {
+          $('#heroAssetPreview').src = state.heroPreviewSrc || element.value || 'assets/demo/hero.jpg';
+          updateVisualSummary();
+        }
+        if (id === 'brandColor' || id === 'canvasColor') renderVisualStudioPreview();
+        invalidateExportConfirmation();
+        scheduleDraftSave();
+        schedulePreviewRefresh();
+        if (['companyAddress', 'privacyUrl', 'termsUrl', 'unsubscribeUrl'].includes(id)) validateExportFields(false);
+        updateExportMode();
+      });
+    });
+
+    $('#copyHtml').addEventListener('click', async () => {
+      if (!$('#riskConfirm').checked) { toast('请先确认本次邮件内容与图片方式'); return; }
+      if (!validateExportFields(true)) return;
+      if (!generateEmail(false)) return;
+      try {
+        await navigator.clipboard.writeText(state.generatedHtml);
+        toast(updateExportMode() ? '演示HTML已复制，请勿直接发送' : 'HTML源码已复制');
+      } catch (error) {
+        $('#sourceOutput').focus();
+        $('#sourceOutput').select();
+        toast('当前浏览器限制自动复制，源码已选中，可手动复制');
+      }
+    });
+    $('#copySubject').addEventListener('click', async () => {
+      const subject = fieldValue('subject');
+      if (!validateContent(true)) return;
+      try {
+        await navigator.clipboard.writeText(subject);
+        toast('邮件主题已复制');
+      } catch (error) {
+        $('#subjectOutput').value = subject;
+        $('#subjectOutput').focus();
+        $('#subjectOutput').select();
+        toast('主题已选中，可手动复制');
+      }
+    });
+    $('#downloadHtml').addEventListener('click', () => {
+      if (!$('#riskConfirm').checked) {
+        toast('请先确认本次邮件内容与图片方式');
+        return;
+      }
+      if (!validateExportFields(true)) return;
+      if (!generateEmail(false)) return;
+      const isDemoExport = updateExportMode();
+      downloadBlob(state.generatedHtml, 'text/html;charset=utf-8', isDemoExport ? 'marketing-email-demo.html' : 'marketing-email.html');
+      toast(isDemoExport ? '演示HTML已生成，请替换示例地址后再发送' : 'HTML文件已生成');
+    });
+    $('#themeToggle').addEventListener('click', () => {
+      const dark = document.documentElement.dataset.theme === 'dark';
+      document.documentElement.dataset.theme = dark ? 'light' : 'dark';
+      $('#themeToggle').innerHTML = `<span aria-hidden="true">${dark ? '☾' : '☀'}</span>`;
+      $('#themeToggle').setAttribute('aria-label', dark ? '切换到深色模式' : '切换到浅色模式');
+      $('#themeToggle').setAttribute('title', dark ? '切换到深色模式' : '切换到浅色模式');
+      try { localStorage.setItem(themeKey, dark ? 'light' : 'dark'); } catch (error) {}
+    });
+
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    let savedTheme = '';
+    try { savedTheme = localStorage.getItem(themeKey) || ''; } catch (error) {}
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      document.documentElement.dataset.theme = 'dark';
+      $('#themeToggle').innerHTML = '<span aria-hidden="true">☀</span>';
+      $('#themeToggle').setAttribute('aria-label', '切换到浅色模式');
+      $('#themeToggle').setAttribute('title', '切换到浅色模式');
+    } else if (savedTheme === 'light') {
+      document.documentElement.dataset.theme = 'light';
+    }
+    restoreDraft();
+    renderAssets();
+    renderContentModules();
+    renderLinkModules();
+    resetLinkCheckState();
+    $('#heroAssetPreview').src = state.heroPreviewSrc || fieldValue('heroUrl') || 'assets/demo/hero.jpg';
+    setStep(0, { skipSave: true });
+    validateExportFields(false);
+    updateSummary();
+    updateContentIntentSummary();
+    updateVisualSummary();
+    updatePreviewToolState();
+  </script>
+</body>
+</html>

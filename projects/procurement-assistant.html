@@ -1,0 +1,960 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>采购提单助手</title>
+  <style>
+    :root {
+      --bg: #f6f7f8;
+      --surface: #ffffff;
+      --line: #dfe3e8;
+      --line-strong: #c9d1dc;
+      --text: #1f2933;
+      --muted: #6b7280;
+      --soft: #eef5f2;
+      --green: #0fba73;
+      --green-dark: #098252;
+      --blue: #2563eb;
+      --amber: #b7791f;
+      --danger: #c2410c;
+      --shadow: 0 8px 24px rgba(31, 41, 51, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Microsoft YaHei", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+      letter-spacing: 0;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      padding: 18px 28px 14px;
+    }
+
+    .top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.25;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      border: 1px solid var(--line-strong);
+      background: var(--surface);
+      color: var(--text);
+      min-height: 36px;
+      padding: 7px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .btn.primary {
+      border-color: var(--green);
+      background: var(--green);
+      color: #fff;
+    }
+
+    .btn:hover { border-color: var(--green); }
+    .btn.primary:hover { background: var(--green-dark); }
+    .btn:active { transform: translateY(1px); }
+
+    main {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      min-height: 0;
+    }
+
+    aside {
+      border-right: 1px solid var(--line);
+      background: var(--surface);
+      padding: 18px;
+      overflow: auto;
+    }
+
+    .workspace {
+      padding: 18px;
+      overflow: auto;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel + .panel { margin-top: 14px; }
+
+    .panel-title {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .panel-title h2,
+    .panel-title h3 {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.3;
+    }
+
+    .panel-body { padding: 16px; }
+
+    .form-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.3;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--text);
+      padding: 9px 10px;
+      outline: none;
+      min-height: 38px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 76px;
+      line-height: 1.55;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(15, 186, 115, 0.12);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 12px 0 4px;
+    }
+
+    .advanced-fields {
+      margin-top: 14px;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+    }
+
+    .advanced-fields summary {
+      color: var(--green-dark);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      list-style: none;
+    }
+
+    .advanced-fields summary::-webkit-details-marker { display: none; }
+    .advanced-fields summary::before { content: "+"; margin-right: 6px; }
+    .advanced-fields[open] summary::before { content: "-"; }
+    .advanced-fields .form-grid { margin-top: 14px; }
+
+    .tab {
+      min-height: 34px;
+      border: 1px solid var(--line-strong);
+      background: #fff;
+      border-radius: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .tab.active {
+      background: var(--soft);
+      color: var(--green-dark);
+      border-color: var(--green);
+      font-weight: 700;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+    }
+
+    .span-4 { grid-column: span 4; }
+    .span-6 { grid-column: span 6; }
+    .span-8 { grid-column: span 8; }
+    .span-12 { grid-column: span 12; }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      min-height: 72px;
+      background: #fbfcfd;
+    }
+
+    .metric b {
+      display: block;
+      font-size: 18px;
+      line-height: 1.25;
+      margin-top: 4px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .copy-block {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfd;
+      overflow: hidden;
+    }
+
+    .copy-head {
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid var(--line);
+      padding: 8px 10px 8px 12px;
+      background: #fff;
+    }
+
+    .copy-head strong {
+      font-size: 13px;
+    }
+
+    .copy-body {
+      white-space: pre-wrap;
+      line-height: 1.65;
+      padding: 12px;
+      min-height: 118px;
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      padding: 10px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f4f6f8;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .status-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .status-item {
+      display: grid;
+      grid-template-columns: 28px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fff;
+    }
+
+    .dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: var(--green);
+      font-size: 12px;
+    }
+
+    .status-item small {
+      color: var(--muted);
+      display: block;
+      margin-top: 2px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 3px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: #fff;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .tag.green {
+      color: var(--green-dark);
+      border-color: rgba(15, 186, 115, 0.35);
+      background: var(--soft);
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+      margin-top: 8px;
+    }
+
+    .alert {
+      border-left: 4px solid var(--amber);
+      background: #fff8e7;
+      padding: 10px 12px;
+      border-radius: 6px;
+      color: #69440f;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .followup-actions {
+      display: flex;
+      align-items: end;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .followup-actions label { flex: 1; }
+
+    .followup-state {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      background: var(--soft);
+      color: var(--green-dark);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      background: #111827;
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 6px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: 0.2s ease;
+      z-index: 50;
+      font-size: 13px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 1120px) {
+      main { grid-template-columns: 1fr; }
+      aside { border-right: 0; border-bottom: 1px solid var(--line); }
+      .span-4, .span-6, .span-8 { grid-column: span 12; }
+      .metric-row { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 680px) {
+      header { padding: 14px; }
+      .top-row { align-items: stretch; flex-direction: column; }
+      aside, .workspace { padding: 12px; }
+      .two-col { grid-template-columns: 1fr; }
+      .metric-row { grid-template-columns: 1fr; }
+      .status-item { grid-template-columns: 24px 1fr; }
+      .status-item .tag { grid-column: 2; justify-self: start; }
+      table { min-width: 680px; }
+      .table-wrap { overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header>
+      <div class="top-row">
+        <div>
+          <h1>采购提单助手</h1>
+          <div class="subtitle">适配已有内部采购平台，面向企查查、天气 API、快递接口等周期性服务采购，自动生成提单内容和续费申请附件。</div>
+        </div>
+        <div class="header-actions">
+          <button class="btn" id="resetBtn" type="button">重置样例</button>
+          <button class="btn" id="downloadDocBtn" type="button">下载附件文档</button>
+          <button class="btn primary" id="copyAllBtn" type="button">复制平台填写内容</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <aside>
+        <div class="panel">
+          <div class="panel-title">
+            <h2>填写采购信息</h2>
+            <span class="tag green">1</span>
+          </div>
+          <div class="panel-body">
+            <select id="scenario" aria-label="采购场景" hidden></select>
+            <div class="tabs" id="scenarioTabs"></div>
+            <div class="form-grid">
+              <label>
+                采购金额
+                <input id="amount" inputmode="decimal" />
+              </label>
+              <label>
+                预计可用至
+                <input id="endDate" />
+              </label>
+              <label>
+                补充说明（选填）
+                <textarea id="note" placeholder="例如本次采购范围、特殊业务影响等"></textarea>
+              </label>
+            </div>
+            <details class="advanced-fields">
+              <summary>必要时再修改更多字段</summary>
+              <div class="form-grid">
+                <label>
+                  采购类型
+                  <select id="purchaseType">
+                    <option value="续费">续费</option>
+                    <option value="新购">新购</option>
+                    <option value="扩容">扩容</option>
+                  </select>
+                </label>
+                <div class="two-col">
+                  <label>
+                    服务开始
+                    <input id="startDate" type="date" />
+                  </label>
+                  <label>
+                    期望完成日期
+                    <input id="targetDate" type="date" />
+                  </label>
+                </div>
+                <label>
+                  开票公司
+                  <select id="invoiceCompany">
+                    <option>同程网络科技股份有限公司</option>
+                    <option>苏州创旅天下信息技术有限公司</option>
+                  </select>
+                </label>
+                <label>
+                  当前余量/到期风险
+                  <input id="riskWindow" />
+                </label>
+                <label>
+                  覆盖业务/使用系统
+                  <textarea id="systems"></textarea>
+                </label>
+                <label>
+                  主要用途
+                  <textarea id="usage"></textarea>
+                </label>
+                <label>
+                  收货地址
+                  <textarea id="address"></textarea>
+                </label>
+              </div>
+            </details>
+            <div class="hint">场景模板已预置常用字段。大多数续费只需确认金额和预计可用时间。</div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="workspace">
+        <div class="dashboard">
+          <div class="panel span-12">
+            <div class="panel-title">
+              <h2>待填写到现有采购平台</h2>
+              <span class="tag green">2</span>
+            </div>
+            <div class="panel-body">
+              <div class="metric-row">
+                <div class="metric">
+                  <span>采购平台分类</span>
+                  <b id="categoryText">服务类 / 信息技术服务</b>
+                </div>
+                <div class="metric">
+                  <span>推荐物料</span>
+                  <b id="materialText">S21010003</b>
+                </div>
+                <div class="metric">
+                  <span>PR 类型</span>
+                  <b>服务费用采购</b>
+                </div>
+                <div class="metric">
+                  <span>提交方式</span>
+                  <b>复制后人工提交</b>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel span-6">
+            <div class="panel-title">
+              <h3>现有采购平台申请原因</h3>
+              <button class="btn" type="button" data-copy="reasonText">复制</button>
+            </div>
+            <div class="panel-body">
+              <div class="copy-block">
+                <div class="copy-body" id="reasonText"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel span-6">
+            <div class="panel-title">
+              <h3>物料明细建议</h3>
+              <button class="btn" type="button" data-copy="materialPlainText">复制</button>
+            </div>
+            <div class="panel-body">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>字段</th>
+                      <th>建议填写</th>
+                    </tr>
+                  </thead>
+                  <tbody id="materialTable"></tbody>
+                </table>
+              </div>
+              <div id="materialPlainText" hidden></div>
+            </div>
+          </div>
+
+          <div class="panel span-8">
+            <div class="panel-title">
+              <h3>附件正文</h3>
+              <button class="btn" type="button" data-copy="attachmentText">复制</button>
+            </div>
+            <div class="panel-body">
+              <div class="copy-block">
+                <div class="copy-head">
+                  <strong id="attachmentTitle">续费申请</strong>
+                  <span class="tag">可下载为 Word 可打开文档</span>
+                </div>
+                <div class="copy-body" id="attachmentText"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel span-4">
+            <div class="panel-title">
+              <h3>提交后跟进</h3>
+              <span class="tag green">3</span>
+            </div>
+            <div class="panel-body">
+              <div class="hint">提交采购单后，在这里回填申请单号。第一期只做记录和续费提醒，不介入采购审批、合同和盖章流程。</div>
+              <div class="followup-actions">
+                <label>
+                  采购申请单号
+                  <input id="requestNo" placeholder="例如 WPU26070100017" />
+                </label>
+                <button class="btn primary" id="saveRequestBtn" type="button">保存</button>
+              </div>
+              <div class="followup-state" id="followupState">尚未记录申请单号</div>
+            </div>
+          </div>
+
+          <div class="panel span-12">
+            <div class="panel-title">
+              <h3>第一期边界</h3>
+              <span class="tag green">采购前置材料</span>
+            </div>
+            <div class="panel-body">
+              <div class="alert" id="adapterText"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast">已复制</div>
+
+  <script>
+    const templates = {
+      qcc: {
+        name: "企查查 API",
+        category: "服务类 / 信息技术服务 / 其他信息技术服务",
+        materialCode: "S21010003",
+        materialName: "其他信息技术服务",
+        customName: "企查查 API 续费充值",
+        unit: "次",
+        usageType: "办公自用",
+        amount: "50000",
+        startDate: "2026-07-01",
+        endDate: "2026 年 12 月底",
+        riskWindow: "当前账户余额预计剩余不足 15 天",
+        systems: "财务金钥匙、同驿商城、盘古基础服务等 20 余个内部业务平台",
+        usage: "企业工商信息、税号开票信息查询及主体校验",
+        targetDate: "2026-07-10"
+      },
+      weather: {
+        name: "天气 API",
+        category: "服务类 / 信息技术服务 / 信息使用费",
+        materialCode: "S21010002",
+        materialName: "信息使用费",
+        customName: "天气 API 服务采购",
+        unit: "次",
+        usageType: "办公自用",
+        amount: "30000",
+        startDate: "2026-07-15",
+        endDate: "2027 年 7 月",
+        riskWindow: "现有接口服务即将到期，需提前完成续费避免调用中断",
+        systems: "出行服务、目的地内容、营销活动页、用户触达等业务场景",
+        usage: "天气实况、天气预报、城市天气展示及出行提醒",
+        targetDate: "2026-07-20"
+      },
+      express: {
+        name: "快递接口",
+        category: "服务类 / 信息技术服务 / 其他信息技术服务",
+        materialCode: "S21010004",
+        materialName: "快递查询",
+        customName: "快递查询接口服务采购",
+        unit: "套",
+        usageType: "办公自用",
+        amount: "20000",
+        startDate: "2026-07-15",
+        endDate: "2027 年 7 月",
+        riskWindow: "现有查询额度接近预警线，需补充额度保障业务查询",
+        systems: "商城订单、售后服务、履约查询、客服工作台等业务系统",
+        usage: "物流轨迹查询、快递状态回传、订单履约信息展示",
+        targetDate: "2026-07-20"
+      }
+    };
+
+    const state = {
+      scenario: "qcc",
+      invoiceCompany: "同程网络科技股份有限公司",
+      address: "江苏苏州工业园区裕新路188号同程大厦8f-d区-082 朱心雨 18013525686"
+    };
+
+    const ids = [
+      "scenario", "purchaseType", "amount", "startDate", "endDate", "invoiceCompany",
+      "riskWindow", "systems", "usage", "targetDate", "address", "note"
+    ];
+
+    const fields = Object.fromEntries(ids.map((id) => [id, document.getElementById(id)]));
+    const requestNoField = document.getElementById("requestNo");
+    const yuan = (value) => {
+      const num = Number(String(value).replace(/[^\d.]/g, "")) || 0;
+      return num.toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    };
+    const shortYuan = (value) => {
+      const num = Number(String(value).replace(/[^\d.]/g, "")) || 0;
+      if (num >= 10000 && num % 10000 === 0) return `${num / 10000} 万元`;
+      return `${num.toLocaleString("zh-CN")} 元`;
+    };
+
+    function init() {
+      Object.entries(templates).forEach(([key, item]) => {
+        const option = document.createElement("option");
+        option.value = key;
+        option.textContent = item.name;
+        fields.scenario.append(option);
+      });
+
+      renderTabs();
+      loadTemplate("qcc");
+
+      ids.forEach((id) => {
+        fields[id].addEventListener("input", render);
+        fields[id].addEventListener("change", () => {
+          if (id === "scenario") loadTemplate(fields.scenario.value);
+          render();
+        });
+      });
+
+      document.querySelectorAll("[data-copy]").forEach((button) => {
+        button.addEventListener("click", () => copyText(document.getElementById(button.dataset.copy).innerText));
+      });
+      document.getElementById("copyAllBtn").addEventListener("click", () => copyText(buildFullPackage()));
+      document.getElementById("downloadDocBtn").addEventListener("click", downloadDoc);
+      document.getElementById("resetBtn").addEventListener("click", () => loadTemplate(fields.scenario.value));
+      document.getElementById("saveRequestBtn").addEventListener("click", saveRequestNo);
+    }
+
+    function renderTabs() {
+      const tabs = document.getElementById("scenarioTabs");
+      tabs.innerHTML = "";
+      Object.entries(templates).forEach(([key, item]) => {
+        const btn = document.createElement("button");
+        btn.className = "tab" + (key === state.scenario ? " active" : "");
+        btn.type = "button";
+        btn.textContent = item.name;
+        btn.addEventListener("click", () => {
+          fields.scenario.value = key;
+          loadTemplate(key);
+        });
+        tabs.append(btn);
+      });
+    }
+
+    function loadTemplate(key) {
+      state.scenario = key;
+      const item = templates[key];
+      fields.scenario.value = key;
+      fields.purchaseType.value = key === "qcc" ? "续费" : "续费";
+      fields.amount.value = item.amount;
+      fields.startDate.value = item.startDate;
+      fields.endDate.value = item.endDate;
+      fields.riskWindow.value = item.riskWindow;
+      fields.systems.value = item.systems;
+      fields.usage.value = item.usage;
+      fields.targetDate.value = item.targetDate;
+      fields.address.value = state.address;
+      fields.invoiceCompany.value = state.invoiceCompany;
+      fields.note.value = "";
+      requestNoField.value = getSavedRequestNo(key);
+      renderTabs();
+      render();
+    }
+
+    function getModel() {
+      const template = templates[fields.scenario.value];
+      return {
+        ...template,
+        purchaseType: fields.purchaseType.value,
+        amount: fields.amount.value,
+        startDate: fields.startDate.value,
+        endDate: fields.endDate.value,
+        invoiceCompany: fields.invoiceCompany.value,
+        riskWindow: fields.riskWindow.value,
+        systems: fields.systems.value,
+        usage: fields.usage.value,
+        targetDate: fields.targetDate.value,
+        address: fields.address.value,
+        note: fields.note.value.trim()
+      };
+    }
+
+    function buildReason(m) {
+      const note = m.note ? ` ${m.note}` : "";
+      return `${m.name} 是公司相关业务场景的重要外部服务能力，已服务 ${m.systems}，主要用于${m.usage}等场景。${m.riskWindow}，为避免服务停用或额度不足影响业务系统正常运行，现申请${m.purchaseType}${shortYuan(m.amount)}，预计可使用至 ${m.endDate}。${note}`;
+    }
+
+    function buildAttachment(m) {
+      return `${m.name}${m.purchaseType}申请
+
+一、采购背景
+${m.name} 是公司相关业务场景的重要外部服务能力，目前主要服务于 ${m.systems}。
+
+二、采购必要性
+该服务主要用于${m.usage}。${m.riskWindow}，如未及时完成${m.purchaseType}，可能影响相关系统的正常查询、校验或展示能力。
+
+三、采购内容
+本次申请${m.purchaseType}${m.name}，采购金额为 ${shortYuan(m.amount)}，开票公司为${m.invoiceCompany}，预计服务周期为 ${m.startDate || "待确认"} 至 ${m.endDate}。
+
+四、使用范围
+本次采购完成后，将继续支撑 ${m.systems} 的日常使用，保障业务连续性和基础数据服务稳定。
+
+五、风险说明
+若未按期完成采购和充值，可能导致接口调用失败、业务查询中断或人工处理成本上升。因此建议按期完成采购流程，并将本次采购记录沉淀至采购提单助手，供后续续费复用。${m.note ? `\n\n六、补充说明\n${m.note}` : ""}`;
+    }
+
+    function buildMaterialRows(m) {
+      return [
+        ["采购分类", m.category],
+        ["PR 类型", "服务费用采购"],
+        ["物料编码", m.materialCode],
+        ["物料名称", m.materialName],
+        ["自定义名称", m.customName],
+        ["参考含税单价", `${yuan(m.amount)} 元`],
+        ["数量", "1"],
+        ["单位", m.unit],
+        ["用途", m.usageType],
+        ["备注", `${m.name}${m.purchaseType}，预计使用至 ${m.endDate}`],
+        ["期望完成日期", m.targetDate || "待填写"],
+        ["收货地址", m.address || "使用默认地址"]
+      ];
+    }
+
+    function render() {
+      const m = getModel();
+      document.getElementById("categoryText").textContent = m.category.replaceAll(" / ", " / ");
+      document.getElementById("materialText").textContent = m.materialCode;
+      document.getElementById("reasonText").textContent = buildReason(m);
+      document.getElementById("attachmentTitle").textContent = `${m.name}${m.purchaseType}申请`;
+      document.getElementById("attachmentText").textContent = buildAttachment(m);
+
+      const rows = buildMaterialRows(m);
+      document.getElementById("materialTable").innerHTML = rows.map(([k, v]) => `<tr><th>${escapeHtml(k)}</th><td>${escapeHtml(v)}</td></tr>`).join("");
+      document.getElementById("materialPlainText").textContent = rows.map(([k, v]) => `${k}：${v}`).join("\n");
+      document.getElementById("adapterText").textContent = buildAdapterText();
+      renderFollowupState();
+    }
+
+    function buildAdapterText() {
+      return "本工具适配已有内部采购平台，不替代采购审批、合同和盖章规则。第一期只覆盖采购前材料准备、物料字段匹配、附件生成和申请单号回填。采购单仍在现有采购平台提交和审批，续费提醒在后续版本接入。";
+    }
+
+    function buildFullPackage() {
+      const m = getModel();
+      return `【采购平台字段】
+申请原因：
+${buildReason(m)}
+
+【物料明细】
+${buildMaterialRows(m).map(([k, v]) => `${k}：${v}`).join("\n")}
+
+【附件正文】
+${buildAttachment(m)}`;
+    }
+
+    function getRequestStorageKey() {
+      return `procurement-assistant-request-no-${fields.scenario.value}`;
+    }
+
+    function getSavedRequestNo(key = fields.scenario.value) {
+      return localStorage.getItem(`procurement-assistant-request-no-${key}`) || "";
+    }
+
+    function saveRequestNo() {
+      const requestNo = requestNoField.value.trim();
+      if (!requestNo) {
+        showToast("请先填写采购申请单号");
+        requestNoField.focus();
+        return;
+      }
+      localStorage.setItem(getRequestStorageKey(), requestNo);
+      renderFollowupState();
+      showToast("申请单号已记录");
+    }
+
+    function renderFollowupState() {
+      const requestNo = getSavedRequestNo();
+      document.getElementById("followupState").textContent = requestNo
+        ? `已记录申请单号：${requestNo}。后续可基于该编号补充提醒和历史记录。`
+        : "尚未记录申请单号。提交采购单后再回填即可。";
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (error) {
+        const temp = document.createElement("textarea");
+        temp.value = text;
+        document.body.append(temp);
+        temp.select();
+        document.execCommand("copy");
+        temp.remove();
+      }
+      showToast("已复制到剪贴板");
+    }
+
+    function downloadDoc() {
+      const m = getModel();
+      const content = buildAttachment(m)
+        .split("\n")
+        .map((line) => line.trim() ? `<p>${escapeHtml(line)}</p>` : "<p>&nbsp;</p>")
+        .join("");
+      const html = `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(m.name)}${escapeHtml(m.purchaseType)}申请</title><style>body{font-family:SimSun,serif;line-height:1.8;font-size:14pt;padding:36px;}p:first-child{text-align:center;font-size:18pt;font-weight:bold;}p{margin:0 0 10px;}</style></head><body>${content}</body></html>`;
+      const blob = new Blob(["\ufeff", html], { type: "application/msword;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${m.name}${m.purchaseType}申请.doc`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("附件文档已生成");
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    init();
+  </script>
+</body>
+</html>

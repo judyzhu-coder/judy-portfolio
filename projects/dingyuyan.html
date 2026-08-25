@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>鼎御私宴 - 小程序 UI 预览</title>
+  <style>
+    :root {
+      --ink: #261812;
+      --moss: #8f251c;
+      --moss-2: #b73a25;
+      --gold: #c89342;
+      --gold-soft: #ead8ae;
+      --paper: #f7f1e5;
+      --porcelain: #fffaf0;
+      --rice: #fbf7ed;
+      --rouge: #b3261e;
+      --line: rgba(38, 24, 18, .12);
+      --shadow: 0 24px 80px rgba(77, 24, 17, .18);
+      --radius: 26px;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18% 8%, rgba(200, 147, 66, .18), transparent 28%),
+        radial-gradient(circle at 85% 16%, rgba(179, 38, 30, .16), transparent 26%),
+        linear-gradient(135deg, #f7ead8 0%, #efe0c6 46%, #f4d7c8 100%);
+    }
+
+    .stage {
+      width: min(1420px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 42px 0 52px;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 28px;
+      margin-bottom: 30px;
+    }
+
+    .brand-kicker {
+      margin: 0 0 8px;
+      color: var(--rouge);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 4vw, 58px);
+      line-height: 1.05;
+      letter-spacing: 0;
+      color: #2a1611;
+    }
+
+    .brand-note {
+      max-width: 500px;
+      margin: 0;
+      color: rgba(24, 35, 31, .68);
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .screens {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(260px, 1fr));
+      gap: 24px;
+      align-items: start;
+    }
+
+    .phone {
+      position: relative;
+      height: 812px;
+      overflow: hidden;
+      border: 10px solid #15100e;
+      border-radius: 42px;
+      background: var(--rice);
+      box-shadow: var(--shadow);
+    }
+
+    .phone::before {
+      content: "";
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      width: 108px;
+      height: 25px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: #111;
+      z-index: 20;
+    }
+
+    .screen {
+      height: 100%;
+      overflow: hidden;
+      background: var(--rice);
+    }
+
+    .status {
+      position: relative;
+      z-index: 4;
+      height: 44px;
+      padding: 12px 22px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status.dark { color: #fff; }
+
+    .pill-icons {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .dot, .bar {
+      display: block;
+      background: currentColor;
+      opacity: .88;
+    }
+
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+    }
+
+    .bar {
+      width: 18px;
+      height: 8px;
+      border-radius: 4px;
+    }
+
+    .content {
+      padding: 0 18px 18px;
+    }
+
+    .hero {
+      position: relative;
+      height: 374px;
+      margin: -44px -10px 0;
+      padding: 78px 26px 24px;
+      color: #fff;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 78% 17%, rgba(244, 200, 126, .22), transparent 26%),
+        radial-gradient(circle at 28% 72%, rgba(215, 74, 45, .32), transparent 30%),
+        linear-gradient(135deg, #7d211a 0%, #42150f 56%, #b74126 100%);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .nav-title {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+    }
+
+    .nav-title strong {
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+
+    .circle-btn {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.28);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .12);
+      color: inherit;
+      font-size: 17px;
+    }
+
+    .hero h2 {
+      position: relative;
+      z-index: 2;
+      max-width: 260px;
+      margin: 38px 0 10px;
+      font-size: 31px;
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      position: relative;
+      z-index: 2;
+      width: 265px;
+      margin: 0;
+      color: rgba(255,255,255,.82);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: -20px;
+      position: relative;
+      z-index: 5;
+    }
+
+    .primary-btn, .ghost-btn {
+      height: 50px;
+      border: 0;
+      border-radius: 18px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .primary-btn {
+      color: #fff;
+      background: linear-gradient(135deg, #a9712d, var(--gold));
+      box-shadow: 0 14px 24px rgba(164, 114, 47, .28);
+    }
+
+    .ghost-btn {
+      color: var(--moss);
+      background: #fff7e9;
+      border: 1px solid rgba(196,154,82,.34);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 22px 0 12px;
+    }
+
+    .section-head h3 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .section-head span {
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .occasion-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .occasion {
+      min-height: 86px;
+      padding: 14px;
+      border-radius: 18px;
+      background: #fffaf1;
+      border: 1px solid var(--line);
+    }
+
+    .occasion b {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .occasion span {
+      display: block;
+      color: rgba(24,35,31,.58);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .chef-mini {
+      display: grid;
+      grid-template-columns: 68px 1fr;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: #fffaf1;
+    }
+
+    .avatar {
+      position: relative;
+      width: 68px;
+      height: 80px;
+      overflow: hidden;
+      border-radius: 15px;
+      background:
+        radial-gradient(circle at 50% 24%, #d8af7d 0 16%, transparent 17%),
+        linear-gradient(145deg, #6f211a 0 48%, #f0d59b 49% 57%, #f9f0df 58%);
+    }
+
+    .avatar::after {
+      content: "";
+      position: absolute;
+      left: 13px;
+      right: 13px;
+      bottom: 9px;
+      height: 16px;
+      border-radius: 50% 50% 8px 8px;
+      background: rgba(255,255,255,.88);
+    }
+
+    .chef-mini h4, .chef-card h4 {
+      margin: 1px 0 6px;
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+
+    .chef-mini p, .chef-card p {
+      margin: 0 0 10px;
+      color: rgba(24,35,31,.62);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      padding: 5px 8px;
+      border-radius: 999px;
+      color: var(--moss);
+      background: rgba(179, 58, 37, .09);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .tabbar {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 12px;
+      height: 66px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      align-items: center;
+      border-radius: 24px;
+      background: rgba(255,250,241,.92);
+      border: 1px solid rgba(24,35,31,.1);
+      box-shadow: 0 10px 30px rgba(24,35,31,.12);
+      backdrop-filter: blur(18px);
+    }
+
+    .tabbar div {
+      text-align: center;
+      color: rgba(24,35,31,.48);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .tabbar b {
+      display: block;
+      width: 24px;
+      height: 24px;
+      margin: 0 auto 4px;
+      border-radius: 50%;
+      border: 2px solid currentColor;
+    }
+
+    .tabbar .active { color: var(--gold); }
+
+    .plain-top {
+      padding: 0 18px;
+      background: var(--rice);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 6px;
+    }
+
+    .topbar h2 {
+      margin: 0;
+      font-size: 26px;
+      letter-spacing: 0;
+    }
+
+    .search {
+      display: flex;
+      align-items: center;
+      height: 44px;
+      gap: 8px;
+      margin: 16px 0 14px;
+      padding: 0 14px;
+      border-radius: 16px;
+      color: rgba(24,35,31,.48);
+      background: #fffaf1;
+      border: 1px solid var(--line);
+      font-size: 13px;
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .chip {
+      flex: 0 0 auto;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: #fffaf1;
+      border: 1px solid var(--line);
+      color: rgba(24,35,31,.66);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .chip.active {
+      color: #fff;
+      background: var(--moss);
+      border-color: var(--moss);
+    }
+
+    .chef-list {
+      display: grid;
+      gap: 12px;
+      padding-bottom: 90px;
+    }
+
+    .chef-card {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 13px;
+      padding: 12px;
+      border-radius: 22px;
+      background: #fffaf1;
+      border: 1px solid var(--line);
+    }
+
+    .chef-card .avatar {
+      width: 92px;
+      height: 112px;
+      border-radius: 18px;
+    }
+
+    .rating {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .book {
+      color: #fff;
+      background: var(--moss);
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+    }
+
+    .detail-hero {
+      position: relative;
+      height: 292px;
+      margin: -44px -10px 0;
+      padding: 78px 24px 0;
+      color: #fff;
+      background:
+        radial-gradient(circle at 78% 18%, rgba(245, 201, 132, .2), transparent 28%),
+        linear-gradient(180deg, rgba(34,14,10,.08), rgba(34,14,10,.84)),
+        linear-gradient(135deg, #7d211a, #2a110d 58%, #b74126);
+      overflow: hidden;
+    }
+
+    .detail-hero::after {
+      content: "";
+      position: absolute;
+      right: 18px;
+      bottom: -16px;
+      width: 176px;
+      height: 235px;
+      border-radius: 88px 88px 20px 20px;
+      background:
+        radial-gradient(circle at 50% 18%, #dcb077 0 15%, transparent 16%),
+        linear-gradient(145deg, transparent 0 27%, #f7efe1 28% 42%, #7a2a20 43%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+    }
+
+    .detail-hero h2 {
+      position: relative;
+      z-index: 2;
+      margin: 8px 0 8px;
+      font-size: 32px;
+      letter-spacing: 0;
+    }
+
+    .detail-hero p {
+      position: relative;
+      z-index: 2;
+      width: 224px;
+      margin: 0;
+      color: rgba(255,255,255,.82);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .detail-body {
+      position: relative;
+      z-index: 4;
+      padding: 0 18px 86px;
+      margin-top: -4px;
+    }
+
+    .profile-panel, .cert-panel, .dish-panel {
+      padding: 16px;
+      border-radius: 22px;
+      background: #fffaf1;
+      border: 1px solid var(--line);
+      margin-bottom: 12px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .stat {
+      padding: 12px 8px;
+      text-align: center;
+      border-radius: 16px;
+      background: rgba(179,58,37,.08);
+    }
+
+    .stat b {
+      display: block;
+      color: var(--moss);
+      font-size: 17px;
+    }
+
+    .stat span {
+      color: rgba(24,35,31,.52);
+      font-size: 11px;
+    }
+
+    .panel-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-weight: 800;
+    }
+
+    .cert {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .cert:first-of-type { border-top: 0; }
+
+    .cert span {
+      color: rgba(24,35,31,.58);
+      font-size: 12px;
+    }
+
+    .ok {
+      color: var(--moss);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .dishes {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .dish {
+      min-height: 88px;
+      padding: 10px;
+      display: flex;
+      align-items: end;
+      border-radius: 16px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      background:
+        linear-gradient(180deg, transparent, rgba(0,0,0,.55)),
+        radial-gradient(circle at 50% 38%, #f3d39b 0 22%, #b3261e 23% 43%, #5a1812 44%);
+    }
+
+    .fixed-cta {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      height: 52px;
+      border: 0;
+      border-radius: 20px;
+      color: #fff;
+      background: linear-gradient(135deg, #b3261e, #c89342);
+      font-size: 16px;
+      font-weight: 800;
+      box-shadow: 0 16px 30px rgba(164, 114, 47, .28);
+      z-index: 20;
+    }
+
+    .form-card {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 24px;
+      background: #fffaf1;
+      border: 1px solid var(--line);
+    }
+
+    .field {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .field:last-child { border-bottom: 0; }
+
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      color: rgba(24,35,31,.58);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .field div {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .field div span {
+      color: rgba(24,35,31,.36);
+      font-size: 18px;
+    }
+
+    .budget {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .budget button {
+      min-height: 46px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      color: var(--ink);
+      background: #fff;
+      font-weight: 800;
+    }
+
+    .budget button.active {
+      color: #fff;
+      background: var(--moss);
+      border-color: var(--moss);
+    }
+
+    .service-note {
+      margin: 8px 0 0;
+      padding: 9px 10px;
+      border-radius: 14px;
+      background: rgba(196,154,82,.12);
+      color: rgba(24,35,31,.66);
+      font-size: 10px;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 1180px) {
+      .screens { grid-template-columns: repeat(2, minmax(280px, 390px)); justify-content: center; }
+      .brand-row { align-items: start; flex-direction: column; }
+    }
+
+    @media (max-width: 720px) {
+      .stage { width: min(390px, calc(100% - 24px)); padding-top: 24px; }
+      .screens { grid-template-columns: 1fr; }
+      .phone { height: 780px; }
+      h1 { font-size: 36px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <header class="brand-row">
+      <div>
+        <p class="brand-kicker">SUCHENG YAN PRIVATE CHEF</p>
+        <h1>鼎御私宴<br />小程序视觉方案</h1>
+      </div>
+      <p class="brand-note">以“主厨档案、私宴定制、管家客服”为核心，让客户先感受到专业和体面，再完成咨询转化。</p>
+    </header>
+
+    <section class="screens">
+      <article class="phone">
+        <div class="screen">
+          <div class="hero">
+            <div class="status dark">
+              <span>9:41</span>
+              <span class="pill-icons"><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="bar"></i></span>
+            </div>
+            <div class="nav-title">
+              <strong>鼎御私宴</strong>
+              <span class="circle-btn">⋯</span>
+            </div>
+            <h2>一席鼎御私宴 私厨到府</h2>
+            <p>家宴、寿宴、商务宴与朋友小聚，由私宴管家为您匹配合适主厨。</p>
+          </div>
+
+          <div class="content">
+            <div class="actions">
+              <button class="primary-btn">定制私宴</button>
+              <button class="ghost-btn">挑选主厨</button>
+            </div>
+
+            <div class="section-head">
+              <h3>宴席场景</h3>
+              <span>查看全部</span>
+            </div>
+            <div class="occasion-grid">
+              <div class="occasion"><b>苏式家宴</b><span>适合长辈团聚与周末家宴</span></div>
+              <div class="occasion"><b>商务私宴</b><span>菜单稳重，服务更讲分寸</span></div>
+              <div class="occasion"><b>寿宴定制</b><span>寓意菜、少油少盐可沟通</span></div>
+              <div class="occasion"><b>朋友小聚</b><span>轻松精致，河鲜海鲜皆可</span></div>
+            </div>
+
+            <div class="section-head">
+              <h3>精选主厨</h3>
+              <span>严选认证</span>
+            </div>
+            <div class="chef-mini">
+              <div class="avatar"></div>
+              <div>
+                <h4>沈主厨 · 苏帮宴席</h4>
+                <p>从厨 22 年，擅长苏帮菜、淮扬菜、河鲜料理。</p>
+                <div class="tag-row"><span class="tag">健康证已认证</span><span class="tag">厨师证已认证</span></div>
+              </div>
+            </div>
+          </div>
+
+          <nav class="tabbar">
+            <div class="active"><b></b>私宴</div>
+            <div><b></b>主厨</div>
+            <div><b></b>定制</div>
+            <div><b></b>我的</div>
+          </nav>
+        </div>
+      </article>
+
+      <article class="phone">
+        <div class="screen">
+          <div class="status">
+            <span>9:41</span>
+            <span class="pill-icons"><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="bar"></i></span>
+          </div>
+          <div class="plain-top">
+            <div class="topbar">
+              <h2>甄选主厨</h2>
+              <span class="circle-btn" style="color:#8f251c;border-color:rgba(143,37,28,.18);background:#fffaf1;">⌕</span>
+            </div>
+            <div class="search">搜索菜系、宴席、主厨姓名</div>
+            <div class="chips">
+              <span class="chip active">全部</span>
+              <span class="chip">苏帮菜</span>
+              <span class="chip">淮扬菜</span>
+              <span class="chip">商务宴</span>
+            </div>
+
+            <div class="chef-list">
+              <div class="chef-card">
+                <div class="avatar"></div>
+                <div>
+                  <h4>沈主厨</h4>
+                  <p>苏帮菜 / 淮扬菜<br />代表菜：松鼠鳜鱼、蟹粉狮子头</p>
+                  <div class="tag-row"><span class="tag">22年经验</span><span class="tag">证件齐全</span></div>
+                  <div class="rating"><span>★ 4.9 · 186场</span><span class="book">咨询</span></div>
+                </div>
+              </div>
+              <div class="chef-card">
+                <div class="avatar" style="background:radial-gradient(circle at 50% 24%, #c89165 0 16%, transparent 17%),linear-gradient(145deg,#4a2a24 0 48%,#f0d59b 49% 57%,#f9f0df 58%);"></div>
+                <div>
+                  <h4>王主厨</h4>
+                  <p>商务宴 / 海鲜料理<br />代表菜：葱焗波龙、金汤花胶</p>
+                  <div class="tag-row"><span class="tag">18年经验</span><span class="tag">摆盘精细</span></div>
+                  <div class="rating"><span>★ 4.8 · 142场</span><span class="book">咨询</span></div>
+                </div>
+              </div>
+              <div class="chef-card">
+                <div class="avatar" style="background:radial-gradient(circle at 50% 24%, #d7a676 0 16%, transparent 17%),linear-gradient(145deg,#6a2b2f 0 48%,#f0d59b 49% 57%,#f9f0df 58%);"></div>
+                <div>
+                  <h4>陈师傅</h4>
+                  <p>家宴 / 川味融合<br />代表菜：樟茶鸭、藤椒鳜鱼片</p>
+                  <div class="tag-row"><span class="tag">15年经验</span><span class="tag">口味可调</span></div>
+                  <div class="rating"><span>★ 4.8 · 98场</span><span class="book">咨询</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <nav class="tabbar">
+            <div><b></b>私宴</div>
+            <div class="active"><b></b>主厨</div>
+            <div><b></b>定制</div>
+            <div><b></b>我的</div>
+          </nav>
+        </div>
+      </article>
+
+      <article class="phone">
+        <div class="screen">
+          <div class="detail-hero">
+            <div class="status dark">
+              <span>9:41</span>
+              <span class="pill-icons"><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="bar"></i></span>
+            </div>
+            <div class="nav-title">
+              <span class="circle-btn">‹</span>
+              <span class="circle-btn">⋯</span>
+            </div>
+            <h2>沈主厨</h2>
+            <p>苏帮家宴主厨，擅长河鲜、时令菜与长辈宴席。</p>
+          </div>
+
+          <div class="detail-body">
+            <div class="profile-panel">
+              <div class="stats">
+                <div class="stat"><b>22年</b><span>从厨经验</span></div>
+                <div class="stat"><b>186</b><span>服务场次</span></div>
+                <div class="stat"><b>4.9</b><span>客户评分</span></div>
+              </div>
+              <div class="tag-row">
+                <span class="tag">苏帮菜</span><span class="tag">淮扬菜</span><span class="tag">河鲜料理</span><span class="tag">长辈家宴</span>
+              </div>
+            </div>
+
+            <div class="cert-panel">
+              <div class="panel-title">资质认证 <span class="ok">平台已核验</span></div>
+              <div class="cert"><b>健康证</b><span>已认证，可查看脱敏件</span></div>
+              <div class="cert"><b>厨师证</b><span>已认证，高级中式烹调师</span></div>
+              <div class="cert"><b>服务规范</b><span>上门流程与卫生标准培训</span></div>
+            </div>
+
+            <div class="dish-panel">
+              <div class="panel-title">代表菜品 <span>苏式宴席</span></div>
+              <div class="dishes">
+                <div class="dish">松鼠鳜鱼</div>
+                <div class="dish">蟹粉狮子头</div>
+                <div class="dish">响油鳝糊</div>
+              </div>
+            </div>
+          </div>
+          <button class="fixed-cta">联系管家定制</button>
+        </div>
+      </article>
+
+      <article class="phone">
+        <div class="screen">
+          <div class="status">
+            <span>9:41</span>
+            <span class="pill-icons"><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="bar"></i></span>
+          </div>
+          <div class="plain-top">
+            <div class="topbar">
+              <h2>定制私宴</h2>
+              <span class="circle-btn" style="color:#8f251c;border-color:rgba(143,37,28,.18);background:#fffaf1;">?</span>
+            </div>
+            <p style="margin:10px 0 0;color:rgba(24,35,31,.62);font-size:13px;line-height:1.7;">填写宴席需求，私宴管家为您推荐主厨、菜单与服务方案。</p>
+
+            <div class="form-card">
+              <div class="field">
+                <label>宴席类型</label>
+                <div>商务私宴 <span>›</span></div>
+              </div>
+              <div class="field">
+                <label>用餐人数</label>
+                <div>8-10 人 <span>›</span></div>
+              </div>
+              <div class="field">
+                <label>用餐时间</label>
+                <div>本周六 18:30 <span>›</span></div>
+              </div>
+              <div class="field">
+                <label>服务地址</label>
+                <div>苏州市 · 工业园区 <span>›</span></div>
+              </div>
+              <div class="field">
+                <label>预算范围</label>
+                <div>尊享 ¥2000-4000 <span>›</span></div>
+              </div>
+              <div class="field">
+                <label>菜系偏好</label>
+                <div>苏帮菜、海鲜、少辣 <span>›</span></div>
+              </div>
+            </div>
+
+            <div class="budget">
+              <button>轻奢</button>
+              <button class="active">尊享</button>
+              <button>高定</button>
+            </div>
+
+            <p class="service-note">提交后，私宴管家将确认人数、菜单、厨师档期与是否需要食材代采、餐具摆台等细节。</p>
+          </div>
+          <button class="fixed-cta">提交定制需求</button>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
