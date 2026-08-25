@@ -173,9 +173,9 @@ img, video { display: block; max-width: 100%; }
 .line-chart figcaption { display: flex; justify-content: space-between; gap: 24px; }
 .line-chart figcaption span { color: var(--accent); font-size: 13px; font-weight: 800; }
 .line-chart svg { width: 100%; height: 300px; overflow: visible; }
-.chart-line { fill: none; stroke: var(--accent); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 1000; stroke-dashoffset: 1000; }
-.chart-fill { fill: var(--accent-soft); opacity: 0; }
-.line-chart circle { fill: var(--accent); opacity: 0; }
+.chart-line { fill: none; stroke: var(--accent); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 1000; stroke-dashoffset: 0; }
+.chart-fill { fill: var(--accent-soft); opacity: 1; }
+.line-chart circle { fill: var(--accent); opacity: 1; }
 .data-visual.is-visible .chart-line { animation: draw-line 1300ms cubic-bezier(.2,.7,.1,1) 200ms forwards; }
 .data-visual.is-visible .chart-fill, .data-visual.is-visible circle { animation: chart-fade 600ms ease 900ms forwards; }
 .chart-axis { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; }
@@ -185,8 +185,8 @@ img, video { display: block; max-width: 100%; }
 .data-secondary b { display: block; font-size: 28px; line-height: 1.2; }
 .data-secondary span { color: var(--muted); font-size: 12px; }
 .concentration i { display: block; width: 97.3%; height: 3px; margin-top: 20px; background: var(--accent); }
-@keyframes draw-line { to { stroke-dashoffset: 0; } }
-@keyframes chart-fade { to { opacity: 1; } }
+@keyframes draw-line { from { stroke-dashoffset: 1000; } to { stroke-dashoffset: 0; } }
+@keyframes chart-fade { from { opacity: 0; } to { opacity: 1; } }
 
 .showcase-carousel { min-width: 0; }
 .showcase-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border: 1px solid rgba(255,255,255,.9); border-radius: 6px; background: rgba(255,255,255,.68); box-shadow: var(--shadow); }
@@ -341,8 +341,8 @@ img, video { display: block; max-width: 100%; }
 .dialog-gallery img { width: 100%; height: auto; object-fit: contain; border: 1px solid var(--line); border-radius: 4px; background: rgba(255,255,255,.65); }
 
 .reveal { opacity: 1; transform: none; }
-.motion-ready .reveal { opacity: 0; transform: translateY(30px); transition: opacity 720ms ease, transform 720ms cubic-bezier(.2,.7,.1,1); }
-.motion-ready .reveal.is-visible { opacity: 1; transform: translateY(0); }
+.motion-ready .reveal.is-visible { animation: reveal-in 620ms cubic-bezier(.2,.7,.1,1) both; }
+@keyframes reveal-in { from { opacity: .15; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
 @media (max-width: 1240px) {
@@ -416,7 +416,7 @@ img, video { display: block; max-width: 100%; }
   .email-stage { height: auto; grid-template-columns: 1fr; }
   .email-tool-frame img { height: auto; aspect-ratio: 1440 / 1100; }
   .email-deliverables { height: 270px; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; }
-  .email-result { aspect-ratio: 4 / 3; }
+  .email-result { width: 100%; height: 100%; aspect-ratio: auto; }
   .data-visual { grid-template-columns: 1fr; }
   .metric-primary { min-height: 160px; }
   .line-chart { padding: 22px 16px; }
